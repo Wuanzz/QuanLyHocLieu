@@ -31,17 +31,17 @@ Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index
 // ==========================================
 // PHÂN HỆ ADMIN (Chỉ Quản trị viên)
 // ==========================================
-Route::prefix('admin')->name('admin.')->group(function () {
-Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
-Route::resource('khoa', KhoaController::class);
-Route::resource('nganh', NganhController::class);
-Route::resource('hoc-phan', HocPhanController::class);
-Route::resource('nguoi-dung', NguoiDungController::class);
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::resource('khoa', KhoaController::class);
+    Route::resource('nganh', NganhController::class);
+    Route::resource('hoc-phan', HocPhanController::class);
+    Route::resource('nguoi-dung', NguoiDungController::class);
 });
 
 // ==========================================
 // PHÂN HỆ GIẢNG VIÊN (Khu vực kiểm duyệt)
 // ==========================================
-Route::prefix('giang-vien')->name('giangvien.')->group(function () {
-Route::get('/kiem-duyet', [KiemDuyetController::class, 'index'])->name('kiemduyet.index');
+Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', 'giangvien'])->group(function () {
+    Route::get('/kiem-duyet', [KiemDuyetController::class, 'index'])->name('kiemduyet.index');
 });
