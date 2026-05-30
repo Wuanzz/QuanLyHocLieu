@@ -25,6 +25,10 @@ Route::post('/dang-xuat', [AuthController::class, 'logout'])->name('logout');
 // ==========================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/kho-tai-lieu', [TaiLieuController::class, 'index'])->name('tailieu.index');
+Route::get('/kho-tai-lieu/them-moi', [TaiLieuController::class, 'create'])->name('tailieu.create');
+Route::post('/kho-tai-lieu/them-moi', [TaiLieuController::class, 'store'])->name('tailieu.store');
+Route::get('/api/get-nganh', [TaiLieuController::class, 'getNganh'])->name('api.getNganh');
+Route::get('/api/get-hoc-phan', [TaiLieuController::class, 'getHocPhan'])->name('api.getHocPhan');
 Route::get('/cong-dong-review', [ReviewController::class, 'index'])->name('review.index');
 Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
 

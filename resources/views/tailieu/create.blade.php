@@ -1,0 +1,141 @@
+@extends('layouts.app')
+
+@section('title', 'Upload Tài Liệu')
+
+@section('content')
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary"><i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i>Upload Tài Liệu Mới</h2>
+                <p class="text-muted">Đóng góp tài liệu của bạn để xây dựng cộng đồng học tập vững mạnh</p>
+            </div>
+
+            <div class="card shadow border-0 rounded-4 p-4 p-md-5 bg-white">
+                <form action="{{ route('tailieu.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    
+                    @if ($errors->any())
+                        <div class="alert alert-danger rounded-3 bg-danger bg-opacity-10 text-danger border-0">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="card bg-primary bg-opacity-10 border-0 rounded-4 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>Chọn môn học phân loại</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">1. Khoa</label>
+                                    <select id="KhoaID" class="form-select border-0 shadow-sm text-dark rounded-3">
+                                        <option value="" class="text-muted">-- Chọn Khoa --</option>
+                                        @foreach($danhSachKhoa as $khoa)
+                                            <option value="{{ $khoa->KhoaID }}">{{ $khoa->TenKhoa }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">2. Ngành</label>
+                                    <select id="NganhID" class="form-select border-0 shadow-sm text-dark rounded-3" disabled>
+                                        <option value="" class="text-muted">-- Đợi chọn Khoa --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">3. Học Phần <span class="text-danger">*</span></label>
+                                    <select name="HocPhanID" id="HocPhanID" class="form-select border-2 border-primary shadow-sm text-dark rounded-3" required disabled>
+                                        <option value="" class="text-muted">-- Đợi chọn Ngành --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="TenTaiLieu" class="form-label fw-bold text-dark">Tên Tài Liệu <span class="text-danger">*</span></label>
+                        <div class="position-relative">
+                            <i class="fa-solid fa-file-signature position-absolute text-muted" style="top: 50%; left: 18px; transform: translateY(-50%); z-index: 10;"></i>
+                            <input type="text" name="TenTaiLieu" id="TenTaiLieu" value="{{ old('TenTaiLieu') }}" class="form-control form-control-lg bg-light border-0 shadow-sm rounded-3 text-dark" style="padding-left: 3rem !important;" placeholder="Ví dụ: Đề thi cuối kỳ Lập trình Web 2023..." required />
+                        </div>
+                        @error('TenTaiLieu')
+                            <span class="text-danger small fw-semibold mt-1 d-block">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="LoaiTaiLieu" class="form-label fw-bold text-dark">Loại Tài Liệu <span class="text-danger">*</span></label>
+                        <div class="position-relative">
+                            <i class="fa-solid fa-tags position-absolute text-muted" style="top: 50%; left: 18px; transform: translateY(-50%); z-index: 10;"></i>
+                            <select name="LoaiTaiLieu" id="LoaiTaiLieu" class="form-select form-select-lg bg-light border-0 shadow-sm rounded-3 text-dark" style="padding-left: 3rem !important;">
+                                <option value="Slide" {{ old('LoaiTaiLieu') == 'Slide' ? 'selected' : '' }}>Slide bài giảng</option>
+                                <option value="DeThi" {{ old('LoaiTaiLieu') == 'DeThi' ? 'selected' : '' }}>Đề thi / Bài tập</option>
+                                <option value="ThamKhao" {{ old('LoaiTaiLieu') == 'ThamKhao' ? 'selected' : '' }}>Tài liệu tham khảo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-5">
+                        <label class="form-label fw-bold text-dark">Chọn File đính kèm <span class="text-danger">*</span></label>
+                        <input type="file" name="fileUpload" class="form-control form-control-lg bg-light border-primary border-2 shadow-sm rounded-3 text-dark" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar" required />
+                        <div class="mt-2 text-muted small fw-semibold">
+                            <i class="fa-solid fa-circle-info text-primary me-1"></i>Định dạng hỗ trợ: PDF, Word, PowerPoint, ZIP, RAR (Tối đa 50MB).
+                        </div>
+                    </div>
+
+                    <hr class="text-muted mb-4" />
+
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{{ route('tailieu.index') }}" class="btn btn-outline-secondary fw-bold rounded-pill px-4 shadow-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-primary text-white fw-bold border-0 rounded-pill px-5 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up text-white me-2"></i>Bắt đầu Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        // Thay đổi cấu trúc lấy dữ liệu AJAX theo Laravel route
+        $('#KhoaID').change(function () {
+            var khoaId = $(this).val();
+            $('#NganhID').empty().append('<option value="" class="text-muted">-- Chọn Ngành --</option>').prop('disabled', true);
+            $('#HocPhanID').empty().append('<option value="" class="text-muted">-- Vui lòng chọn Ngành trước --</option>').prop('disabled', true);
+
+            if (khoaId) {
+                $.get('{{ route("api.getNganh") }}', { khoaId: khoaId }, function (data) {
+                    $.each(data, function (i, item) {
+                        $('#NganhID').append('<option value="' + item.NganhID + '">' + item.TenNganh + '</option>');
+                    });
+                    $('#NganhID').prop('disabled', false);
+                });
+            }
+        });
+
+        $('#NganhID').change(function () {
+            var nganhId = $(this).val();
+            $('#HocPhanID').empty().append('<option value="" class="text-muted">-- Chọn Học Phần --</option>').prop('disabled', true);
+
+            if (nganhId) {
+                $.get('{{ route("api.getHocPhan") }}', { nganhId: nganhId }, function (data) {
+                    $.each(data, function (i, item) {
+                        $('#HocPhanID').append('<option value="' + item.HocPhanID + '">' + item.TenHocPhan + '</option>');
+                    });
+                    $('#HocPhanID').prop('disabled', false);
+                });
+            }
+        });
+    });
+</script>
+@endpush
