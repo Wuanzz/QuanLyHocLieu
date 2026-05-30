@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\NganhController;
 use App\Http\Controllers\Admin\HocPhanController;
 use App\Http\Controllers\Admin\NguoiDungController;
 use App\Http\Controllers\GiangVien\KiemDuyetController;
+use App\Http\Controllers\BaoCaoController;
 
 // ==========================================
 // XÁC THỰC (Đăng nhập, Đăng xuất)
@@ -29,9 +30,14 @@ Route::get('/kho-tai-lieu/them-moi', [TaiLieuController::class, 'create'])->name
 Route::post('/kho-tai-lieu/them-moi', [TaiLieuController::class, 'store'])->name('tailieu.store');
 Route::get('/api/get-nganh', [TaiLieuController::class, 'getNganh'])->name('api.getNganh');
 Route::get('/api/get-hoc-phan', [TaiLieuController::class, 'getHocPhan'])->name('api.getHocPhan');
-Route::get('/cong-dong-review', [ReviewController::class, 'index'])->name('review.index');
-Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
+Route::get('/kho-tai-lieu/chi-tiet/{id}', [TaiLieuController::class, 'show'])->name('tailieu.show');
+Route::get('/kho-tai-lieu/tai-ve/{id}', [TaiLieuController::class, 'download'])->name('tailieu.download');
+Route::post('/kho-tai-lieu/binh-luan', [TaiLieuController::class, 'addComment'])->name('tailieu.addComment');
 
+Route::get('/cong-dong-review', [ReviewController::class, 'index'])->name('review.index');
+
+Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
+Route::post('/bao-cao/gui-bao-cao', [BaoCaoController::class, 'store'])->name('baocao.store');
 // ==========================================
 // PHÂN HỆ ADMIN (Chỉ Quản trị viên)
 // ==========================================

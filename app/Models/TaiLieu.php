@@ -30,4 +30,9 @@ class TaiLieu extends Model
     {
         return $this->belongsTo(HocPhan::class, 'HocPhanID', 'HocPhanID');
     }
+
+    public function BinhLuans()
+    {
+        return $this->hasMany(BinhLuan::class, 'TaiLieuID', 'TaiLieuID');
+    }
 }

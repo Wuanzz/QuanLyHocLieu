@@ -9,6 +9,7 @@ use App\Models\Khoa;
 use App\Models\Nganh;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\BinhLuan;
 
 class TaiLieuController extends Controller
 {
@@ -56,7 +57,7 @@ class TaiLieuController extends Controller
             'HocPhanID' => 'required',
             'TenTaiLieu' => 'required|max:255',
             'LoaiTaiLieu' => 'required',
-            'fileUpload' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,zip,rar|max:51200' // Giới hạn 50MB
+            'fileUpload' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,zip,rar|max:51200' 
         ], [
             'fileUpload.mimes' => 'Chỉ chấp nhận các định dạng: pdf, doc, docx, ppt, pptx, zip, rar.',
             'fileUpload.max' => 'Dung lượng file không được vượt quá 50MB.'
@@ -66,10 +67,9 @@ class TaiLieuController extends Controller
             $file = $request->file('fileUpload');
             $filename = time() . '_' . $file->getClientOriginalName();
             
-            // Lưu file vào thư mục storage/app/public/tailieu
-            $path = $file->storeAs('public/tailieu', $filename);
+            // LƯU Ý SỬA ĐỔI: Lưu trực tiếp vào ổ 'public' để đường dẫn trong DB được gọn gàng
+            $path = $file->storeAs('tailieu', $filename, 'public');
             
-            // Tính dung lượng MB
             $sizeMB = round($file->getSize() / 1048576, 2);
 
             TaiLieu::create([
@@ -78,13 +78,12 @@ class TaiLieuController extends Controller
                 'LoaiTaiLieu' => $request->LoaiTaiLieu,
                 'KichThuoc' => $sizeMB,
                 'NgayUpload' => now(),
-                'TrangThaiDuyet' => 'ChoDuyet', // Mặc định chờ Giảng viên duyệt
+                'TrangThaiDuyet' => 'ChoDuyet',
                 'LuotTai' => 0,
                 'NguoiDungID' => Auth::id(),
                 'HocPhanID' => $request->HocPhanID
             ]);
 
-            // Trả về trang danh sách kèm thông báo (có thể bắn qua Toast)
             return redirect()->route('tailieu.index')->with('success', 'Tải lên thành công! Tài liệu đang chờ kiểm duyệt.');
         }
 
@@ -103,5 +102,55 @@ class TaiLieuController extends Controller
     {
         $hocphans = HocPhan::where('NganhID', $request->nganhId)->get();
         return response()->json($hocphans);
+    }
+
+    // Hàm hiển thị Chi tiết tài liệu
+    public function show($id)
+    {
+        $taiLieu = TaiLieu::with([
+            'HocPhan', 
+            'NguoiDung', 
+            'BinhLuans' => function($query) {
+                $query->orderBy('NgayDang', 'desc');
+            },
+            'BinhLuans.NguoiDung'
+        ])->findOrFail($id);
+
+        return view('tailieu.show', compact('taiLieu'));
+    }
+
+    // Hàm xử lý Tải xuống và Tăng lượt tải
+    public function download($id)
+    {
+        $taiLieu = TaiLieu::findOrFail($id);
+        
+        $taiLieu->increment('LuotTai');
+
+        $filePath = storage_path('app/public/' . $taiLieu->DuongDanFile);
+
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'File không tồn tại trên hệ thống.');
+        }
+
+        return response()->download($filePath, $taiLieu->TenTaiLieu . '.' . pathinfo($filePath, PATHINFO_EXTENSION));
+    }
+
+    // Hàm xử lý Thêm Bình luận
+    public function addComment(Request $request)
+    {
+        $request->validate([
+            'TaiLieuID' => 'required',
+            'NoiDung' => 'required|max:500'
+        ]);
+
+        BinhLuan::create([
+            'TaiLieuID' => $request->TaiLieuID,
+            'NguoiDungID' => Auth::id(),
+            'NoiDung' => $request->NoiDung,
+            'NgayDang' => now(),
+            'TrangThaiDuyet' => 'HopLe' // Cho phép hiển thị ngay
+        ]);
+
+        return back()->with('success', 'Đã thêm bình luận thành công.');
     }
 }

@@ -1,0 +1,207 @@
+@extends('layouts.app')
+
+@section('title', 'Chi tiết Tài liệu')
+
+@section('content')
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light">
+        <h2 class="fw-bold text-primary mb-0"><i class="fa-solid fa-file-lines text-primary me-3"></i>{{ $taiLieu->TenTaiLieu }}</h2>
+        <a class="btn btn-outline-primary fw-bold rounded-pill px-4 shadow-sm" href="{{ route('tailieu.index') }}">
+            <i class="fa-solid fa-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check fs-4 text-success me-3"></i>
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-xmark fs-4 text-danger me-3"></i>
+            <div>{{ session('error') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('ThongBaoBaoCao'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check fs-4 text-success me-3"></i>
+            <div>
+                <strong class="text-success">Thành công!</strong> {{ session('ThongBaoBaoCao') }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden h-100">
+                <div class="card-header bg-primary bg-opacity-10 border-0 py-3 px-4">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="fa-solid fa-eye me-2"></i>Xem trước tài liệu</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (!empty($taiLieu->DuongDanFile) && str_ends_with(strtolower($taiLieu->DuongDanFile), '.pdf'))
+                        <iframe src="{{ Storage::url($taiLieu->DuongDanFile) }}" width="100%" height="700px" style="border: none;"></iframe>
+                    @else
+                        <div class="p-5 text-center d-flex flex-column justify-content-center align-items-center" style="min-height: 400px; background-color: #f8fbfc;">
+                            <i class="fa-solid fa-file-shield fs-1 text-primary opacity-50 mb-3"></i>
+                            <h5 class="text-primary fw-bold mb-2">Chức năng xem trước hiện chỉ hỗ trợ file PDF</h5>
+                            <p class="text-muted mb-4">Vui lòng tải về để xem nội dung file Word / PowerPoint / Zip.</p>
+                            <a class="btn btn-primary text-white fw-bold rounded-pill px-5 py-2 shadow-sm" href="{{ route('tailieu.download', $taiLieu->TaiLieuID) }}">
+                                <i class="fa-solid fa-download text-white me-2"></i>Tải về máy ({{ $taiLieu->LuotTai }} lượt tải)
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-4"><i class="fa-solid fa-circle-info me-2"></i>Thông tin chi tiết</h5>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold">Môn học</small>
+                                <span class="text-success fw-bold">{{ $taiLieu->HocPhan?->TenHocPhan }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold">Người đăng</small>
+                                <span class="text-dark fw-bold">{{ $taiLieu->NguoiDung?->HoTen ?? 'Ẩn danh' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-hard-drive"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold">Dung lượng</small>
+                                <span class="text-dark fw-bold">{{ $taiLieu->KichThuoc }} MB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted my-4 opacity-25" />
+
+                    <a class="btn btn-primary text-white fw-bold w-100 rounded-pill py-2 shadow-sm mb-3" href="{{ route('tailieu.download', $taiLieu->TaiLieuID) }}">
+                        <i class="fa-solid fa-download text-white me-2"></i>Tải xuống ngay ({{ $taiLieu->LuotTai }})
+                    </a>
+                    
+                    @if(Auth::check())
+                        <button type="button" class="btn btn-outline-danger w-100 fw-bold rounded-pill py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalBaoCao">
+                            <i class="fa-solid fa-flag text-danger me-2"></i>Báo cáo vi phạm
+                        </button>
+                    @endif
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary bg-opacity-10 border-0 py-3 px-4">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="fa-regular fa-comments me-2"></i>Thảo luận ({{ $taiLieu->BinhLuans->count() }})</h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    @if(Auth::check())
+                        <form action="{{ route('tailieu.addComment') }}" method="POST" class="mb-4 d-flex gap-2">
+                            @csrf
+                            <input type="hidden" name="TaiLieuID" value="{{ $taiLieu->TaiLieuID }}" />
+                            <div class="position-relative flex-grow-1">
+                                <i class="fa-regular fa-comment-dots position-absolute text-muted" style="top: 50%; left: 16px; transform: translateY(-50%); z-index: 10;"></i>
+                                <input type="text" name="NoiDung" class="form-control bg-light border-0 shadow-sm rounded-pill text-dark w-100" style="padding-left: 3rem !important;" placeholder="Nhập bình luận..." required />
+                            </div>
+                            <button class="btn btn-primary text-white fw-bold rounded-pill px-3 shadow-sm" title="Gửi bình luận" type="submit">
+                                <i class="fa-solid fa-paper-plane text-white"></i>
+                            </button>
+                        </form>
+                    @else
+                        <div class="alert alert-secondary border-0 rounded-3 small text-center mb-4">
+                            Vui lòng <a href="{{ route('login') }}" class="fw-bold text-primary">đăng nhập</a> để tham gia thảo luận.
+                        </div>
+                    @endif
+
+                    <div class="comment-list pe-2" style="max-height: 400px; overflow-y: auto;">
+                        @if ($taiLieu->BinhLuans->count() > 0)
+                            @foreach ($taiLieu->BinhLuans as $cmt)
+                                <div class="d-flex mb-3">
+                                    <div class="flex-shrink-0 me-2">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light p-3 rounded-4 shadow-sm flex-grow-1 border border-white">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-primary small">{{ $cmt->NguoiDung?->HoTen ?? 'Ẩn danh' }}</strong>
+                                            <small class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ \Carbon\Carbon::parse($cmt->NgayDang)->format('d/m H:i') }}</small>
+                                        </div>
+                                        <p class="mb-0 text-dark small">{{ $cmt->NoiDung }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fa-regular fa-comments fs-2 text-muted opacity-50 mb-2 d-block"></i>
+                                <p class="text-muted fst-italic small mb-0">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalBaoCao" tabindex="-1" aria-labelledby="modalBaoCaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <form action="{{ route('baocao.store') }}" method="POST">
+                @csrf
+                <div class="modal-header bg-danger bg-opacity-10 border-0 py-3">
+                    <h5 class="modal-title fw-bold text-danger" id="modalBaoCaoLabel"><i class="fa-solid fa-triangle-exclamation me-2"></i>Báo cáo Tài liệu vi phạm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" name="TaiLieuID" value="{{ $taiLieu->TaiLieuID }}" />
+
+                    <div class="alert bg-warning bg-opacity-10 text-dark border-0 rounded-3 small mb-4">
+                        <i class="fa-solid fa-circle-info text-warning me-2"></i>
+                        Bạn đang báo cáo tài liệu: <strong>{{ $taiLieu->TenTaiLieu }}</strong>. <br />
+                        <span class="text-muted mt-1 d-block">Lưu ý: Cố tình báo cáo sai sự thật nhiều lần có thể dẫn đến khóa tài khoản.</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-dark">Lý do báo cáo: <span class="text-danger">*</span></label>
+                        <div class="position-relative">
+                            <i class="fa-solid fa-pen position-absolute text-muted" style="top: 15px; left: 16px; z-index: 10;"></i>
+                            <textarea name="LyDo" class="form-control bg-light border-0 shadow-sm rounded-4 text-dark" style="padding-left: 3rem !important; padding-top: 12px;" rows="4" required placeholder="Ví dụ: Tài liệu bị mờ, không đúng môn học, chứa nội dung nhạy cảm..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light py-3">
+                    <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-danger text-white fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="fa-solid fa-paper-plane text-white me-2"></i>Gửi Báo Cáo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
