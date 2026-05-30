@@ -23,16 +23,6 @@
         </div>
     @endif
 
-    @if (session('error'))
-        <div class="alert bg-warning bg-opacity-10 text-dark alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
-            <i class="fa-solid fa-triangle-exclamation text-warning fs-4 me-3"></i>
-            <div>
-                <strong class="fw-bold">Thông báo:</strong> {{ session('error') }}
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
     @if ($reviews->count() > 0)
          <div class="row g-4">
             @foreach ($reviews as $item)
@@ -44,17 +34,15 @@
                                 <h5 class="card-title text-success fw-bold mb-0 lh-base pe-2">
                                     <i class="fa-solid fa-book-open me-1"></i> {{ $item->HocPhan?->TenHocPhan ?? 'Môn học ẩn' }}
                                 </h5>
-                                <div class="bg-warning bg-opacity-10 px-2 py-1 rounded-pill flex-shrink-0 text-nowrap shadow-sm">
-                                    @for ($i = 0; $i < $item->SoSao; $i++)
-                                        <span class="text-warning" style="font-size: 0.75rem;">⭐</span>
-                                    @endfor
+                                <div class="bg-warning bg-opacity-10 px-2 py-1 rounded-pill flex-shrink-0 text-nowrap shadow-sm text-warning fw-bold" style="font-size: 0.85rem;">
+                                    ⭐ {{ $item->sao_trung_binh }} ({{ $item->danhGias->count() }} vote)
                                 </div>
                             </div>
 
-                            <p class="card-text text-dark opacity-75 mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            <p class="card-text text-dark opacity-75 mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                                 "{{ $item->NoiDung }}"
                             </p>
-                              </div>
+                        </div>
 
                         <div class="card-footer bg-light border-0 py-3 px-4 rounded-bottom-4 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">

@@ -26,16 +26,26 @@
                     </div>
                 </div>
 
-                <div class="bg-warning bg-opacity-10 px-3 py-2 rounded-pill shadow-sm fs-5 text-nowrap">
-                    @for ($i = 0; $i < $review->SoSao; $i++)
-                        <span class="text-warning">⭐</span>
-                    @endfor
+                <div class="bg-warning bg-opacity-10 px-3 py-2 rounded-pill shadow-sm fs-5 text-nowrap text-warning fw-bold">
+                    ⭐ <span id="diem-trung-binh">{{ $review->sao_trung_binh }}</span> (<span id="luot-vote">{{ $review->danhGias->count() }}</span> lượt vote)
                 </div>
             </div>
 
             <hr class="text-muted opacity-25 mb-4" />
 
-            <p class="fs-5 lh-lg text-dark" style="white-space: pre-line;">{{ $review->NoiDung }}</p>
+            <p class="fs-5 lh-lg text-dark mb-4" style="white-space: pre-line;">{{ $review->NoiDung }}</p>
+
+            <div class="p-3 bg-light rounded-4 d-inline-block border border-white shadow-sm">
+                <span class="fw-bold text-dark me-3 small text-uppercase">Chấm điểm độ hữu ích:</span>
+                
+                <div class="d-inline-flex gap-1 fs-4" id="star-rating-box" style="cursor: pointer;" data-user-vote="{{ $userVote ?? 0 }}">
+                    @php $voteHienTai = $userVote ?? 0; @endphp
+                    @for($i = 1; $i <= 5; $i++)
+                        <i class="{{ $i <= $voteHienTai ? 'fa-solid' : 'fa-regular' }} fa-star text-warning" data-value="{{ $i }}"></i>
+                    @endfor
+                </div>
+                <span id="vote-status-text" class="ms-2 small text-muted fst-italic"></span>
+            </div>
         </div>
     </div>
 
@@ -43,7 +53,7 @@
         <div class="alert bg-success bg-opacity-10 text-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
             <i class="fa-solid fa-robot fs-4 me-3"></i>
             <div>
-                <strong class="fw-bold">Hệ thống AI:</strong> {{ session('ThongBaoBinhLuan') }}
+                <strong class="fw-bold">Hệ thống:</strong> {{ session('ThongBaoBinhLuan') }}
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -61,20 +71,16 @@
                 <div class="d-flex gap-2">
                     <div class="position-relative flex-grow-1">
                         <i class="fa-regular fa-comment-dots position-absolute text-muted" style="top: 50%; left: 18px; transform: translateY(-50%); z-index: 10;"></i>
-                        <input type="text" name="NoiDung" class="form-control form-control-lg bg-light border-0 shadow-sm rounded-pill text-dark w-100" style="padding-left: 3.5rem !important;" placeholder="Bạn có đồng ý với đánh giá này không? Chia sẻ ý kiến nhé..." required />
+                        <input type="text" name="NoiDung" class="form-control form-control-lg bg-light border-0 shadow-sm rounded-pill text-dark w-100" style="padding-left: 3.5rem !important;" placeholder="Bạn có đồng ý với đánh giá này không?..." required />
                     </div>
                     <button type="submit" class="btn btn-primary text-white fw-bold rounded-pill px-4 shadow-sm flex-shrink-0">
                         <i class="fa-solid fa-paper-plane text-white me-2"></i>Gửi
                     </button>
                 </div>
-                <small class="text-muted mt-2 ms-3 d-block fst-italic"><i class="fa-solid fa-shield-halved text-success me-1"></i>Bình luận của bạn sẽ được AI kiểm duyệt trước khi hiển thị.</small>
             </form>
 
             <div class="comment-section">
-                @php
-                    // Lấy ra các bình luận Gốc (ParentID là null)
-                    $binhLuanGoc = $danhSachBinhLuan->whereNull('ParentID');
-                @endphp
+                @php $binhLuanGoc = $danhSachBinhLuan->whereNull('ParentID'); @endphp
 
                 @if ($binhLuanGoc->count() > 0)
                     @foreach ($binhLuanGoc as $cmt)
@@ -111,11 +117,7 @@
                                     </form>
                                 </div>
 
-                                @php
-                                    // Lấy các câu trả lời thuộc về bình luận gốc này
-                                    $cacReply = $danhSachBinhLuan->where('ParentID', $cmt->BinhLuanID);
-                                @endphp
-                                
+                                @php $cacReply = $danhSachBinhLuan->where('ParentID', $cmt->BinhLuanID); @endphp
                                 @if ($cacReply->count() > 0)
                                     <div class="mt-3 ps-4 ms-2 border-start border-3 border-light">
                                         @foreach ($cacReply as $reply)
@@ -151,3 +153,63 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // BẰNG CHỨNG CẢI TIẾN: Đọc dữ liệu từ thuộc tính HTML data, JavaScript hoàn toàn sạch sẽ chuẩn JS thuần
+        let currentVote = parseInt($('#star-rating-box').data('user-vote')) || 0;
+
+        // Xử lý hiệu ứng hover chuột lên ngôi sao
+        $('#star-rating-box i').hover(function() {
+            let val = $(this).data('value');
+            $('#star-rating-box i').each(function() {
+                if ($(this).data('value') <= val) {
+                    $(this).removeClass('fa-regular').addClass('fa-solid');
+                } else {
+                    $(this).removeClass('fa-solid').addClass('fa-regular');
+                }
+            });
+        }, function() {
+            // Khi bỏ chuột ra, khôi phục lại trạng thái đã vote ban đầu
+            $('#star-rating-box i').each(function() {
+                if ($(this).data('value') <= currentVote) {
+                    $(this).removeClass('fa-regular').addClass('fa-solid');
+                } else {
+                    $(this).removeClass('fa-solid').addClass('fa-regular');
+                }
+            });
+        });
+
+        // Bắt sự kiện CLICK để gửi AJAX vote điểm
+        $('#star-rating-box i').click(function() {
+            let soSao = $(this).data('value');
+            let reviewId = '{{ $review->ReviewID }}';
+
+            $.ajax({
+                url: '{{ route("review.rate") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    ReviewID: reviewId,
+                    SoSao: soSao
+                },
+                success: function(response) {
+                    // Cập nhật điểm trung bình và số lượt vote mới lên màn hình lập tức
+                    $('#diem-trung-binh').text(response.saoTrungBinh);
+                    $('#luot-vote').text(response.luotVote);
+                    
+                    $('#vote-status-text').text(response.success).removeClass('text-danger').addClass('text-success');
+                    
+                    // Ghim chặt số sao vừa chọn làm mốc trạng thái mới
+                    currentVote = soSao; 
+                },
+                error: function(xhr) {
+                    let errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Có lỗi xảy ra.';
+                    $('#vote-status-text').text(errorMsg).removeClass('text-success').addClass('text-danger');
+                }
+            });
+        });
+    });
+</script>
+@endpush

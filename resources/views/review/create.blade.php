@@ -55,20 +55,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label for="SoSao" class="form-label fw-bold text-dark">Chấm điểm <span class="text-danger">*</span></label>
-                        <div class="position-relative">
-                            <i class="fa-solid fa-star position-absolute text-warning" style="top: 50%; left: 18px; transform: translateY(-50%); z-index: 10;"></i>
-                            <select name="SoSao" id="SoSao" class="form-select form-select-lg bg-light border-0 shadow-sm rounded-3 text-dark" style="padding-left: 3rem !important;">
-                                <option value="5" {{ old('SoSao') == '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ (5 Sao - Xuất sắc)</option>
-                                <option value="4" {{ old('SoSao') == '4' ? 'selected' : '' }}>⭐⭐⭐⭐ (4 Sao - Tốt)</option>
-                                <option value="3" {{ old('SoSao') == '3' ? 'selected' : '' }}>⭐⭐⭐ (3 Sao - Khá)</option>
-                                <option value="2" {{ old('SoSao') == '2' ? 'selected' : '' }}>⭐⭐ (2 Sao - Trung bình)</option>
-                                <option value="1" {{ old('SoSao') == '1' ? 'selected' : '' }}>⭐ (1 Sao - Cần cải thiện)</option>
-                            </select>
-                        </div>
-                    </div>
-
                     <div class="form-group mb-5">
                         <label for="NoiDung" class="form-label fw-bold text-dark">Nội dung Review <span class="text-danger">*</span></label>
                         <div class="position-relative">

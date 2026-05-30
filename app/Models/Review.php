@@ -20,4 +20,17 @@ class Review extends Model
     {
         return $this->belongsTo(HocPhan::class, 'HocPhanID', 'HocPhanID');
     }
+
+    public function danhGias()
+    {
+        return $this->hasMany(DanhGiaReview::class, 'ReviewID', 'ReviewID');
+    }
+
+    // Hàm tự động tính toán điểm trung bình sao của bài Review
+    public function getSaoTrungBinhAttribute()
+    {
+        // Tính trung bình cột SoSao từ bảng phụ, làm tròn 1 chữ số thập phân
+        $trungBinh = $this->danhGias()->avg('SoSao');
+        return $trungBinh ? round($trungBinh, 1) : 0;
+    }
 }

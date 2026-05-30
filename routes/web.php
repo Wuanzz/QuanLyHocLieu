@@ -41,6 +41,7 @@ Route::get('/cong-dong-review/chi-tiet/{id}', [ReviewController::class, 'show'])
 Route::get('/api/review/get-nganh', [ReviewController::class, 'getNganh'])->name('api.review.getNganh');
 Route::get('/api/review/get-hoc-phan', [ReviewController::class, 'getHocPhan'])->name('api.review.getHocPhan');
 Route::post('/cong-dong-review/binh-luan', [ReviewController::class, 'addComment'])->name('review.addComment');
+Route::post('/cong-dong-review/cham-diem', [ReviewController::class, 'rate'])->name('review.rate');
 
 
 Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
