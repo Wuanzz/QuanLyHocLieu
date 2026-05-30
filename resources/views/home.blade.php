@@ -77,7 +77,7 @@
                                     <small class="text-muted fw-semibold"><i class="fa-regular fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($item->NgayUpload)->format('d/m/Y') }}</small>
                                 </div>
 
-                                <h5 class="card-title fw-bold mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                                <h5 class="card-title fw-bold mb-3" style="display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
                                     <a href="{{ url('kho-tai-lieu/' . $item->TaiLieuID) }}" class="text-decoration-none text-dark stretched-link">
                                         {{ $item->TenTaiLieu }}
                                     </a>
