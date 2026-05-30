@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="col-md-2 d-flex gap-2" id="khu-vuc-nut-bam">
-                        <a href="{{ route('tailieu.index') }}" class="btn btn-secondary text-white fw-bold rounded-pill shadow-sm w-100" title="Xóa bộ lọc">
+                        <a href="{{ route('tailieu.index') }}" class="btn btn-outline-secondary text-dark fw-bold rounded-pill shadow-sm w-100" title="Xóa bộ lọc">
                             <i class="fa-solid fa-rotate-right me-2"></i>Làm mới
                         </a>
                     </div>
