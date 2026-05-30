@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@yield('title', 'Trang Chủ') - EduShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/zephyr/bootstrap.min.css">
+    
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}" />
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold text-primary fs-4" href="{{ route('home') }}">
+                    🎓 EduShare
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 align-items-center">
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-bold me-2" href="{{ route('home') }}">Trang Chủ</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-info fw-bold" href="{{ route('tailieu.index') }}">Kho Tài Liệu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-bold" href="{{ route('review.index') }}">Cộng đồng Review</a>
+                        </li>
+                        
+                        @if (Auth::check() && in_array(Auth::user()->VaiTro, ['Admin', 'GiangVien']))
+                            <a href="{{ Auth::user()->VaiTro === 'Admin' ? route('admin.dashboard') : route('giangvien.kiemduyet.index') }}" class="btn btn-outline-primary fw-bold ms-2 rounded-pill shadow-sm">
+                                <i class="fa-solid fa-shield-halved me-2"></i>Sang Trang Quản Trị
+                            </a>
+                        @endif
+                    </ul>
+
+                    <ul class="navbar-nav align-items-center">
+                        @if (Auth::check())
+                            <li class="nav-item d-flex align-items-center">
+                                <a class="nav-link text-primary" href="{{ route('hoso.index') }}">
+                                    Xin chào, <strong class="text-decoration-underline">{{ Auth::user()->HoTen }}</strong>!
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                                <a href="#" class="btn btn-outline-danger ms-2 btn-sm fw-bold" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="btn btn-primary fw-bold" href="{{ route('login') }}">Đăng nhập</a>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container flex-grow-1">
+        <main role="main" class="pb-3">
+            @yield('content')
+        </main>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <footer class="custom-footer mt-auto py-5 position-static">
+        <hr class="mb-5" style="border-top: 1px solid #dee2e6; opacity: 0.5;">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 pe-md-4 footer-border-right mb-4 mb-md-0">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center">
+                        <span class="me-2" style="color: #fbbc04; font-size: 1.8rem;">🎓</span> EduShare
+                    </h4>
+                    <p class="mb-2 fw-semibold">Cam kết tài liệu chuẩn xác 100%</p>
+                    <p class="mb-4 small">Trao tri thức - Nhận niềm tin</p>
+
+                    <div class="d-flex gap-3">
+                        <a href="#" class="social-btn text-decoration-none"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn text-decoration-none"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn text-decoration-none"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4 px-md-4 footer-border-right mb-4 mb-md-0">
+                    <h5 class="fw-bold mb-4">Liên Hệ Hỗ Trợ</h5>
+                    <div class="d-flex mb-3 align-items-start">
+                        <span class="footer-icon-yellow me-2">📍</span>
+                        <span class="small pt-1">280 An Dương Vương, Q.5, TP. Hồ Chí Minh</span>
+                    </div>
+                    <div class="d-flex mb-3 align-items-center">
+                        <span class="footer-icon-yellow me-2">📞</span>
+                        <span class="small">0909 123 456 ( 8:00 - 22:00 )</span>
+                    </div>
+                    <div class="d-flex mb-3 align-items-center">
+                        <span class="footer-icon-yellow me-2">✉️</span>
+                        <span class="small">edushare.support@gmail.com</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4 ps-md-4">
+                    <h5 class="fw-bold mb-4">Chứng Nhận & Bản Quyền</h5>
+                    <p class="small mb-3">Tuân thủ bản quyền nội dung số</p>
+                    <div class="d-flex gap-2 mb-4">
+                        <div class="payment-icon">💳</div>
+                        <div class="payment-icon">🅿️</div>
+                        <div class="payment-icon">🏦</div>
+                    </div>
+                    <hr style="border-color: #2d3342;" class="mb-3" />
+                    <p class="mb-1 small text-darker">&copy; 2026 EduShare. All rights reserved</p>
+                    <p class="mb-0 small">Designed by <strong>Nhóm 4</strong></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1055">
+        <div id="liveToast" class="toast align-items-center text-white bg-primary border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex p-1">
+                <div class="toast-body fw-bold fs-6" id="toastMessage">
+                </div>
+                <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="{{ asset('js/site.js') }}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Khởi tạo ăng-ten kết nối đến Hub
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/notificationHub")
+                .build();
+
+            // Lắng nghe sự kiện "ReceiveNotification" từ Server
+            connection.on("ReceiveNotification", function (message) {
+                document.getElementById("toastMessage").innerText = message;
+
+                const toastLiveExample = document.getElementById('liveToast');
+                const toast = new bootstrap.Toast(toastLiveExample, { delay: 6000 });
+                toast.show();
+            });
+
+            // Bắt đầu kết nối
+            connection.start().then(function () {
+                console.log("📡 Đã kết nối SignalR thành công! Sẵn sàng nhận thông báo.");
+            }).catch(function (err) {
+                console.error("Lỗi kết nối SignalR: ", err.toString());
+            });
+        });
+    </script>
+
+    @stack('scripts')
+</body>
+</html>

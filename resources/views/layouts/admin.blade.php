@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@yield('title', 'Admin Dashboard')</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/zephyr/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ----- THANH SIDEBAR BÊN TRÁI ----- */
+        #sidebar {
+            min-width: 270px;
+            max-width: 270px;
+            background: #1e2b3c; /* Màu xanh đen cực kỳ chuyên nghiệp */
+            color: #fff;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            z-index: 999;
+        }
+
+        /* HIỆU ỨNG THU GỌN SIDEBAR */
+        #sidebar.active {
+            margin-left: -270px;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 25px 20px;
+            background: #15202b; /* Màu đậm hơn cho khu vực logo */
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Ép màu trắng tuyệt đối chống lại theme Zephyr */
+        #sidebar .sidebar-header h5 {
+            color: #ffffff !important;
+        }
+
+        #sidebar .sidebar-header small {
+            color: #aebccc !important;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        #sidebar ul li a {
+            padding: 14px 25px;
+            font-size: 1.05em;
+            font-weight: 500;
+            display: block;
+            color: #aebccc;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Hiệu ứng khi hover hoặc đang ở trang hiện tại */
+        #sidebar ul li a:hover, #sidebar ul li.active > a {
+            color: #ffffff;
+            background: #0d6efd; /* Xanh primary sáng lên */
+            border-left: 5px solid #ffffff;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        /* Tùy chỉnh riêng cho nút Về trang chủ */
+        .btn-exit-admin {
+            border: 2px solid rgba(255, 255, 255, 0.5) !important;
+            color: #ffffff !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-exit-admin:hover {
+            background-color: #ffffff !important;
+            color: #1e2b3c !important; /* Đổi màu chữ thành xanh đen khi hover */
+            border-color: #ffffff !important;
+        }
+
+        /* ----- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) ----- */
+        #content {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Thanh Top Navigation mỏng bên trên */
+        .top-navbar {
+            background: #ffffff;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Vùng chứa dữ liệu */
+        .main-body {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        /* Style chung cho Card trên Dashboard */
+        .card {
+            border-radius: 16px !important;
+            border: none !important;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Hiệu ứng làm mờ và cấm click cho Menu không có quyền */
+        .menu-disabled {
+            opacity: 0.4;
+            pointer-events: none; /* Cấm mọi thao tác click/hover chuột */
+            cursor: not-allowed !important;
+            filter: grayscale(100%);
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div class="sidebar-header d-flex align-items-center">
+            <i class="fa-solid fa-shield-halved fs-2 text-primary me-3"></i>
+            <div>
+                <h5 class="mb-0 fw-bold">Admin Panel</h5>
+                <small style="font-size: 0.75rem;">Hệ thống Quản trị</small>
+            </div>
+        </div>
+
+        <ul class="list-unstyled components">
+            @php
+                // Khai báo biến kiểm tra quyền
+                $isAdmin = Auth::check() && Auth::user()->VaiTro === 'Admin';
+                $isGiangVien = Auth::check() && Auth::user()->VaiTro === 'GiangVien';
+            @endphp
+
+            <li>
+                <a href="{{ route('admin.dashboard') }}" class="{{ !$isAdmin ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.khoa.index') }}" class="{{ !$isAdmin ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-building"></i> Quản lý Khoa
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.nganh.index') }}" class="{{ !$isAdmin ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-layer-group"></i> Quản lý Ngành
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.hoc-phan.index') }}" class="{{ !$isAdmin ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-book"></i> Quản lý Học phần
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.nguoi-dung.index') }}" class="{{ !$isAdmin ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-users"></i> Quản lý Người dùng
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('giangvien.kiemduyet.index') }}" class="{{ !$isGiangVien ? 'menu-disabled' : '' }}">
+                    <i class="fa-solid fa-folder-open"></i> Khu vực kiểm duyệt
+                </a>
+            </li>
+        </ul>
+
+        <div class="p-4 border-top border-secondary border-opacity-25 mt-auto">
+            <a href="{{ route('home') }}" class="btn btn-exit-admin w-100 rounded-pill fw-bold">
+                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Về trang chủ
+            </a>
+        </div>
+    </nav>
+
+    <div id="content">
+        <nav class="top-navbar">
+            <div>
+                <h5 class="mb-0 fw-bold text-dark"><i id="sidebarCollapse" class="fa-solid fa-bars text-primary me-3" style="cursor:pointer; transition: 0.3s;"></i>Dashboard</h5>
+            </div>
+            <div class="d-flex align-items-center">
+                @if (Auth::check())
+                    <span class="me-3 fw-bold text-dark small">Xin chào, <strong>{{ Auth::user()->HoTen }}</strong>!</span>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                        @if (Auth::user()->VaiTro === 'Admin')
+                            <i class="fa-solid fa-user-shield"></i>
+                        @else
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </nav>
+
+        <div class="main-body">
+            @yield('content')
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Script cho nút bấm thu gọn/mở rộng Sidebar
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+
+    @stack('scripts')
+</body>
+</html>
