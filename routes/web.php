@@ -36,7 +36,11 @@ Route::post('/kho-tai-lieu/binh-luan', [TaiLieuController::class, 'addComment'])
 
 Route::get('/cong-dong-review', [ReviewController::class, 'index'])->name('review.index');
 Route::get('/cong-dong-review/them-moi', [ReviewController::class, 'create'])->name('review.create');
+Route::post('/cong-dong-review/them-moi', [ReviewController::class, 'store'])->name('review.store');
 Route::get('/cong-dong-review/chi-tiet/{id}', [ReviewController::class, 'show'])->name('review.show');
+Route::get('/api/review/get-nganh', [ReviewController::class, 'getNganh'])->name('api.review.getNganh');
+Route::get('/api/review/get-hoc-phan', [ReviewController::class, 'getHocPhan'])->name('api.review.getHocPhan');
+
 
 Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
 Route::post('/bao-cao/gui-bao-cao', [BaoCaoController::class, 'store'])->name('baocao.store');
