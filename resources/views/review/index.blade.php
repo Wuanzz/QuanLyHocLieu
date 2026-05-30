@@ -39,7 +39,7 @@
                                 </div>
                             </div>
 
-                            <p class="card-text text-dark opacity-75 mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            <p class="card-text text-dark opacity-75 mb-4 flex-grow-1" style="display: -webkit-box; display: box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                                 "{{ $item->NoiDung }}"
                             </p>
                         </div>
