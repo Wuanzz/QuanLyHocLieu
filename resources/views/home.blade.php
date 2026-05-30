@@ -1,1 +1,143 @@
-Đây là trang chủ
+@extends('layouts.app')
+
+@section('title', 'Trang Chủ')
+
+@section('content')
+<div class="p-5 mb-5 rounded-4 shadow border-0 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #00d4ff 100%); color: white;">
+    <div class="container-fluid py-4 position-relative" style="z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3 text-white">Khám Phá Tri Thức & <br />Đánh Giá Học Phần</h1>
+                <p class="fs-5 opacity-75 mb-4" style="max-width: 600px;">
+                    Nền tảng giúp bạn dễ dàng tìm kiếm đề thi, slide bài giảng và đọc những đánh giá chân thực nhất. Học tập thông minh hơn mỗi ngày!
+                </p>
+                <div class="d-flex gap-3">
+                    <a class="btn btn-light btn-lg fw-bold text-primary px-4 rounded-pill shadow-sm" href="{{ route('tailieu.index') }}">
+                        <i class="fa-solid fa-book-open me-2"></i>Kho Tài Liệu
+                    </a>
+                    <a class="btn btn-outline-light btn-lg fw-bold px-4 rounded-pill" href="{{ route('review.index') }}">
+                        <i class="fa-solid fa-star me-2"></i>Đọc Review
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block text-center">
+                <i class="fa-solid fa-graduation-cap text-white opacity-25" style="font-size: 12rem; transform: rotate(15deg);"></i>
+            </div>
+        </div>
+    </div>
+    <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 300px; height: 300px; top: -50px; right: -50px;"></div>
+    <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 150px; height: 150px; bottom: 20px; right: 250px;"></div>
+</div>
+
+<div class="row mb-5 text-center">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body">
+                <div class="display-5 text-primary mb-2"><i class="fa-solid fa-file-pdf"></i></div>
+                <h3 class="fw-bold text-dark mb-0">1,200+</h3>
+                <p class="text-muted mb-0">Tài liệu chia sẻ</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body">
+                <div class="display-5 text-warning mb-2"><i class="fa-solid fa-comments"></i></div>
+                <h3 class="fw-bold text-dark mb-0">850+</h3>
+                <p class="text-muted mb-0">Review chân thực</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body">
+                <div class="display-5 text-success mb-2"><i class="fa-solid fa-users"></i></div>
+                <h3 class="fw-bold text-dark mb-0">3,500+</h3>
+                <p class="text-muted mb-0">Thành viên tham gia</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-2 border-info">
+            <h4 class="text-info fw-bold m-0"><i class="fa-solid fa-cloud-arrow-down me-2"></i>Tài Liệu Mới Cập Nhật</h4>
+            <a href="{{ route('tailieu.index') }}" class="btn btn-sm btn-outline-info rounded-pill fw-bold px-3">Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+
+         <div class="row row-cols-1 row-cols-md-2 g-4">
+            @if (!empty($taiLieuMoi) && $taiLieuMoi->count() > 0)
+                 @foreach ($taiLieuMoi as $item)
+                      <div class="col">
+                        <div class="card shadow-sm h-100 border-0 position-relative border-bottom border-info border-4 rounded-4" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2 shadow-sm">{{ $item->LoaiTaiLieu }}</span>
+                                    <small class="text-muted fw-semibold"><i class="fa-regular fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($item->NgayUpload)->format('d/m/Y') }}</small>
+                                </div>
+
+                                <h5 class="card-title fw-bold mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                                    <a href="{{ url('kho-tai-lieu/' . $item->TaiLieuID) }}" class="text-decoration-none text-dark stretched-link">
+                                        {{ $item->TenTaiLieu }}
+                                    </a>
+                                </h5>
+
+                                <p class="card-text text-success small fw-bold mb-1"><i class="fa-solid fa-book me-1"></i> {{ $item->HocPhan?->TenHocPhan ?? 'Đang cập nhật' }}</p>
+                            </div>
+
+                            <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 d-flex justify-content-between align-items-center">
+                                <small class="text-muted fw-semibold"><i class="fa-solid fa-user-graduate me-1"></i> {{ $item->NguoiDung?->HoTen ?? 'Ẩn danh' }}</small>
+                                <small class="text-info fw-bold bg-info bg-opacity-10 px-2 py-1 rounded"><i class="fa-solid fa-download me-1"></i> {{ $item->LuotTai }}</small>
+                            </div>
+                        </div>
+                             </div>
+                @endforeach
+            @else
+                 <div class="col-12">
+                    <div class="alert alert-info rounded-4 shadow-sm border-0"><i class="fa-solid fa-circle-info me-2"></i>Chưa có tài liệu nào trên hệ thống.</div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-2 border-warning">
+            <h4 class="text-warning fw-bold m-0 text-dark"><i class="fa-solid fa-star text-warning me-2"></i>Review Gần Đây</h4>
+        </div>
+
+          <div class="list-group shadow-sm border-0 rounded-4">
+            @if (!empty($reviewMoi) && $reviewMoi->count() > 0)
+                @foreach ($reviewMoi as $item)
+                    <div class="card shadow-sm border-0 mb-3 position-relative border-start border-warning border-4 rounded-4" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="pe-3 w-100">
+                                    <a href="{{ url('cong-dong-review/' . $item->ReviewID) }}" class="text-decoration-none h6 mb-1 fw-bold text-primary d-block stretched-link">
+                                        {{ $item->HocPhan?->TenHocPhan ?? 'Đang cập nhật' }}
+                                    </a>
+                                    <p class="mb-0 small text-truncate text-muted" style="max-width: 95%;">"{{ $item->NoiDung }}"</p>
+                                </div>
+                                <div class="text-end flex-shrink-0">
+                                    <small class="text-muted fw-semibold">{{ \Carbon\Carbon::parse($item->NgayDang)->format('d/m') }}</small>
+                                </div>
+                            </div>
+
+                             <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
+                                <small class="text-dark fw-semibold"><i class="fa-solid fa-user-circle text-muted me-1"></i>{{ $item->NguoiDung?->HoTen ?? 'Ẩn danh' }}</small>
+                                <div class="bg-warning bg-opacity-10 px-2 rounded-pill">
+                                    @for ($i = 0; $i < $item->SoSao; $i++)
+                                        <span class="text-warning" style="font-size: 0.75rem;">⭐</span>
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                <div class="p-4 text-muted fst-italic border-0 rounded-4 bg-light text-center shadow-sm"><i class="fa-solid fa-comment-slash fs-3 d-block mb-2 text-secondary"></i> Chưa có đánh giá nào.</div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection

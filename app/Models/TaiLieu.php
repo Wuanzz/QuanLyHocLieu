@@ -20,4 +20,14 @@ class TaiLieu extends Model
         'NguoiDungID', 
         'HocPhanID'
     ];
+
+    public function NguoiDung()
+    {
+        return $this->belongsTo(NguoiDung::class, 'NguoiDungID', 'NguoiDungID');
+    }
+
+    public function HocPhan()
+    {
+        return $this->belongsTo(HocPhan::class, 'HocPhanID', 'HocPhanID');
+    }
 }
