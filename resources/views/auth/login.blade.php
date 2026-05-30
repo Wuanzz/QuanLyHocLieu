@@ -1,20 +1,175 @@
-@if ($errors->any())
-    <div style="color: red;">
-        {{ $errors->first() }}
-    </div>
-@endif
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Hệ thống Quản lý học liệu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/zephyr/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-<form action="{{ route('login') }}" method="POST">
-    @csrf
-    <div>
-        <label>Email:</label>
-        <input type="email" name="Email" required>
+        .login-card {
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0d6efd 0%, #00d4ff 100%);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            border: 1.5px solid #e0e4e8;
+            background-color: #f8fbfc;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .input-group-text {
+            border-radius: 12px;
+            border: 1.5px solid #e0e4e8;
+            background-color: #f8fbfc;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login {
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 0.8rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-login:active {
+            transform: scale(0.97);
+        }
+
+        .btn-back-home {
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .btn-back-home:hover {
+            transform: translateX(-5px);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="mb-3 text-start">
+                    <a href="{{ route('home') }}" class="text-decoration-none fw-bold text-primary btn-back-home d-inline-block">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Quay về trang chủ
+                    </a>
+                </div>
+
+                <div class="card login-card p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Chào mừng trở lại!</h3>
+                        <p class="text-muted small">Đăng nhập vào hệ thống Quản lý học liệu & Review học phần</p>
+                    </div>
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger rounded-3 p-2 small text-center shadow-sm">
+                            <div class="mb-0">{{ $errors->first() }}</div>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('login') }}" method="POST">
+                        @csrf
+                        <div class="form-group mb-4">
+                            <label for="Email" class="form-label fw-bold text-secondary small text-uppercase">Email tài khoản</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fa-regular fa-envelope"></i></span>
+                                <input type="email" name="Email" id="Email" value="{{ old('Email') }}" class="form-control border-start-0 ps-0" placeholder="Nhập email..." required />
+                            </div>
+                            @error('Email')
+                                <span class="text-danger small mt-1 d-block">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="MatKhau" class="form-label fw-bold text-secondary small text-uppercase mb-0">Mật khẩu</label>
+                                <a href="javascript:void(0);" onclick="alert('Tính năng khôi phục mật khẩu đang được phát triển!!!');" class="text-decoration-none small fw-bold text-primary">Quên mật khẩu?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" name="MatKhau" id="MatKhau" class="form-control border-start-0 border-end-0 ps-0" placeholder="Nhập mật khẩu..." required />
+                                <span class="input-group-text bg-transparent text-muted" id="togglePassword" style="cursor: pointer;">
+                                    <i class="fa-regular fa-eye"></i>
+                                </span>
+                            </div>
+                            @error('MatKhau')
+                                <span class="text-danger small mt-1 d-block">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-login">
+                                ĐĂNG NHẬP NGAY <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <br>
-    <div>
-        <label>Mật khẩu:</label>
-        <input type="password" name="MatKhau" required>
-    </div>
-    <br>
-    <button type="submit">Đăng nhập</button>
-</form>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#togglePassword').click(function() {
+                const passwordInput = $('#MatKhau');
+                const icon = $(this).find('i');
+
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordInput.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
