@@ -44,7 +44,12 @@ Route::post('/cong-dong-review/binh-luan', [ReviewController::class, 'addComment
 Route::post('/cong-dong-review/cham-diem', [ReviewController::class, 'rate'])->name('review.rate');
 
 
-Route::get('/ho-so-ca-nhan', [HoSoController::class, 'index'])->name('hoso.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/ho-so', [HoSoController::class, 'index'])->name('hoso.index');
+    Route::post('/ho-so/cap-nhat-anh', [HoSoController::class, 'capNhatAnhDaiDien'])->name('hoso.capNhatAnhDaiDien');
+    Route::get('/ho-so/doi-mat-khau', [HoSoController::class, 'doiMatKhau'])->name('hoso.doiMatKhau');
+});
+
 Route::post('/bao-cao/gui-bao-cao', [BaoCaoController::class, 'store'])->name('baocao.store');
 // ==========================================
 // PHÂN HỆ ADMIN (Chỉ Quản trị viên)
