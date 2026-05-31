@@ -34,7 +34,7 @@
         <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="card-body">
                 <div class="display-5 text-primary mb-2"><i class="fa-solid fa-file-pdf"></i></div>
-                <h3 class="fw-bold text-dark mb-0">1,200+</h3>
+                <h3 class="fw-bold text-dark mb-0">{{ number_format($tongTaiLieu) }}</h3>
                 <p class="text-muted mb-0">Tài liệu chia sẻ</p>
             </div>
         </div>
@@ -43,7 +43,7 @@
         <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="card-body">
                 <div class="display-5 text-warning mb-2"><i class="fa-solid fa-comments"></i></div>
-                <h3 class="fw-bold text-dark mb-0">850+</h3>
+                <h3 class="fw-bold text-dark mb-0">{{ number_format($tongReview) }}</h3>
                 <p class="text-muted mb-0">Review chân thực</p>
             </div>
         </div>
@@ -52,7 +52,7 @@
         <div class="card border-0 shadow-sm h-100 rounded-4 bg-white py-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="card-body">
                 <div class="display-5 text-success mb-2"><i class="fa-solid fa-users"></i></div>
-                <h3 class="fw-bold text-dark mb-0">3,500+</h3>
+                <h3 class="fw-bold text-dark mb-0">{{ number_format($tongNguoiDung) }}</h3>
                 <p class="text-muted mb-0">Thành viên tham gia</p>
             </div>
         </div>
