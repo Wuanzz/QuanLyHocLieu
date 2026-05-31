@@ -78,7 +78,7 @@
                                 </div>
 
                                 <h5 class="card-title fw-bold mb-3" style="display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
-                                    <a href="{{ url('kho-tai-lieu/' . $item->TaiLieuID) }}" class="text-decoration-none text-dark stretched-link">
+                                    <a href="{{ url('kho-tai-lieu/chi-tiet/' . $item->TaiLieuID) }}" class="text-decoration-none text-dark stretched-link">
                                         {{ $item->TenTaiLieu }}
                                     </a>
                                 </h5>
@@ -113,7 +113,7 @@
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div class="pe-3 w-100">
-                                    <a href="{{ url('cong-dong-review/' . $item->ReviewID) }}" class="text-decoration-none h6 mb-1 fw-bold text-primary d-block stretched-link">
+                                    <a href="{{ url('cong-dong-review/chi-tiet/' . $item->ReviewID) }}" class="text-decoration-none h6 mb-1 fw-bold text-primary d-block stretched-link">
                                         {{ $item->HocPhan?->TenHocPhan ?? 'Đang cập nhật' }}
                                     </a>
                                     <p class="mb-0 small text-truncate text-muted" style="max-width: 95%;">"{{ $item->NoiDung }}"</p>
