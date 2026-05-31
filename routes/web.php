@@ -47,7 +47,8 @@ Route::post('/cong-dong-review/cham-diem', [ReviewController::class, 'rate'])->n
 Route::middleware(['auth'])->group(function () {
     Route::get('/ho-so', [HoSoController::class, 'index'])->name('hoso.index');
     Route::post('/ho-so/cap-nhat-anh', [HoSoController::class, 'capNhatAnhDaiDien'])->name('hoso.capNhatAnhDaiDien');
-    Route::get('/ho-so/doi-mat-khau', [HoSoController::class, 'doiMatKhau'])->name('hoso.doiMatKhau');
+    Route::get('/ho-so/doi-mat-khau', [\App\Http\Controllers\HoSoController::class, 'doiMatKhau'])->name('hoso.doiMatKhau');
+    Route::post('/ho-so/doi-mat-khau', [\App\Http\Controllers\HoSoController::class, 'xuLyDoiMatKhau'])->name('hoso.xuLyDoiMatKhau');
 });
 
 Route::post('/bao-cao/gui-bao-cao', [BaoCaoController::class, 'store'])->name('baocao.store');
