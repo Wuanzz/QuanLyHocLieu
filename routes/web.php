@@ -6,7 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaiLieuController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\HoSoController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\NganhController;
 use App\Http\Controllers\Admin\HocPhanController;
@@ -56,7 +56,7 @@ Route::post('/bao-cao/gui-bao-cao', [BaoCaoController::class, 'store'])->name('b
 // PHÂN HỆ ADMIN (Chỉ Quản trị viên)
 // ==========================================
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('khoa', KhoaController::class);
     Route::resource('nganh', NganhController::class);
     Route::resource('hoc-phan', HocPhanController::class);
