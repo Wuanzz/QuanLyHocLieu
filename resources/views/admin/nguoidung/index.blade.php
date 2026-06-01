@@ -15,6 +15,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>Lỗi cập nhật! Vui lòng kiểm tra lại.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <div class="row align-items-center mb-4">
         <div class="col-md-9 mb-3 mb-md-0">
@@ -78,11 +85,65 @@
                                     {{ \Carbon\Carbon::parse($item->NgayDangKy)->format('d/m/Y') }}
                                 </td>
                                 <td class="text-center">
-                                    <a class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" href="{{ route('admin.nguoi-dung.edit', $item->NguoiDungID) }}">
+                                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#editModal-{{ $item->NguoiDungID }}">
                                         <i class="fa-solid fa-user-shield me-1"></i> Phân quyền
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
+
+                            <div class="modal fade" id="editModal-{{ $item->NguoiDungID }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $item->NguoiDungID }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 rounded-4 shadow">
+                                        <div class="modal-header bg-primary text-white border-bottom-0 py-3 px-4">
+                                            <h5 class="modal-title fw-bold" id="editModalLabel-{{ $item->NguoiDungID }}">
+                                                <i class="fa-solid fa-user-shield me-2"></i>Cập nhật Tài khoản
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-modal="dismiss" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <form action="{{ route('admin.nguoi-dung.update', $item->NguoiDungID) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            
+                                            <div class="modal-body p-4 text-start">
+                                                <div class="mb-3">
+                                                    <p class="mb-1 text-muted small">Đang thao tác với tài khoản:</p>
+                                                    <h5 class="fw-bold text-primary mb-0">{{ $item->HoTen }}</h5>
+                                                </div>
+
+                                                <div class="p-3 bg-light rounded-3 border border-light small mb-4">
+                                                    <div class="mb-1"><strong>Email:</strong> <span class="text-dark">{{ $item->Email }}</span></div>
+                                                    <div><strong>Ngày tham gia:</strong> <span class="text-muted">{{ \Carbon\Carbon::parse($item->NgayDangKy)->format('d/m/Y') }}</span></div>
+                                                </div>
+
+                                                <div class="form-group mb-4">
+                                                    <label class="form-label fw-bold text-dark mb-2">Vai trò (Phân quyền) <span class="text-danger">*</span></label>
+                                                    <select name="VaiTro" class="form-select border-primary shadow-sm" required>
+                                                        <option value="SinhVien" {{ $item->VaiTro == 'SinhVien' ? 'selected' : '' }}>Sinh viên (Người dùng chung)</option>
+                                                        <option value="GiangVien" {{ $item->VaiTro == 'GiangVien' ? 'selected' : '' }}>Giảng viên (Người kiểm duyệt)</option>
+                                                        <option value="Admin" {{ $item->VaiTro == 'Admin' ? 'selected' : '' }}>Admin (Quản trị viên)</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label class="form-label fw-bold text-dark mb-2">Trạng thái tài khoản <span class="text-danger">*</span></label>
+                                                    <select name="TrangThai" class="form-select border-danger shadow-sm" required>
+                                                        <option value="HoatDong" {{ ($item->TrangThai == 'HoatDong' || $item->TrangThai == 'Hoạt động') ? 'selected' : '' }}>Cho phép Hoạt động</option>
+                                                        <option value="Khoa" {{ $item->TrangThai == 'Khoa' ? 'selected' : '' }}>Khóa tài khoản (Cấm đăng nhập)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-top-0 p-3 pt-0 px-4">
+                                                <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                                                <button type="submit" class="btn btn-primary fw-bold rounded-pill px-4 shadow-sm">
+                                                    Lưu thay đổi
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
                     @else
                         <tr>

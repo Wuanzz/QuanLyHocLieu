@@ -41,7 +41,36 @@ class NguoiDungController extends Controller
     // Các hàm trống tạm thời
     public function create() { return "View Create đang được xây dựng"; }
     public function store(Request $request) {}
-    public function edit($id) { return "View Edit đang được xây dựng"; }
-    public function update(Request $request, $id) {}
+
+    public function edit($id)
+    {
+        return "Không dùng view Edit nữa vì đã dùng Modal";
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Kiểm tra dữ liệu đầu vào hợp lệ
+        $request->validate([
+            'VaiTro' => 'required|in:SinhVien,GiangVien,Admin',
+            'TrangThai' => 'required|in:HoatDong,Khoa',
+        ], [
+            'VaiTro.required' => 'Vui lòng chọn vai trò cho tài khoản.',
+            'VaiTro.in' => 'Vai trò được chọn không hợp lệ.',
+            'TrangThai.required' => 'Vui lòng chọn trạng thái cho tài khoản.',
+            'TrangThai.in' => 'Trạng thái được chọn không hợp lệ.',
+        ]);
+
+        $nguoidung = NguoiDung::findOrFail($id);
+
+        // Thực hiện cập nhật vào CSDL
+        $nguoidung->update([
+            'VaiTro' => $request->VaiTro,
+            'TrangThai' => $request->TrangThai,
+        ]);
+
+        // Điều hướng về trang danh sách kèm thông báo thành công
+        return redirect()->route('admin.nguoi-dung.index')->with('success', 'Cập nhật tài khoản thành công!');
+    }
+
     public function destroy($id) {}
 }
