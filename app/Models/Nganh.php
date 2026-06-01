@@ -10,4 +10,9 @@ class Nganh extends Model
     protected $primaryKey = 'NganhID';
     public $timestamps = false;
     protected $fillable = ['TenNganh', 'MoTa', 'KhoaID'];
+
+    public function Khoa()
+    {
+        return $this->belongsTo(Khoa::class, 'KhoaID', 'KhoaID');
+    }
 }
