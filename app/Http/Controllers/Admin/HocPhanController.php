@@ -69,8 +69,49 @@ class HocPhanController extends Controller
         return response()->json($danhSachNganh);
     }
 
-    public function edit($id) { return "View Edit đang được xây dựng"; }
-    public function update(Request $request, $id) {}
+    public function edit($id)
+    {
+        // Tìm Học phần theo ID
+        $hocphan = HocPhan::findOrFail($id);
+        
+        // Dò ngược tìm Khoa hiện tại thông qua Ngành của Học Phần
+        $nganhHienTai = Nganh::find($hocphan->NganhID);
+        $khoaIdHienTai = $nganhHienTai ? $nganhHienTai->KhoaID : null;
+
+        // Lấy toàn bộ danh sách Khoa để đổ vào ô Dropdown 1
+        $danhSachKhoa = Khoa::orderBy('TenKhoa', 'asc')->get();
+        
+        // Lấy danh sách Ngành thuộc Khoa hiện tại để nạp sẵn vào ô Dropdown 2
+        $danhSachNganh = [];
+        if ($khoaIdHienTai) {
+            $danhSachNganh = Nganh::where('KhoaID', $khoaIdHienTai)->orderBy('TenNganh', 'asc')->get();
+        }
+
+        return view('admin.hocphan.edit', compact('hocphan', 'danhSachKhoa', 'danhSachNganh', 'khoaIdHienTai'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'NganhID' => 'required',
+            'TenHocPhan' => 'required|max:255',
+            'MoTa' => 'nullable'
+        ], [
+            'NganhID.required' => 'Vui lòng chọn Ngành đào tạo cho học phần này.',
+            'TenHocPhan.required' => 'Vui lòng nhập tên học phần.',
+            'TenHocPhan.max' => 'Tên học phần không được vượt quá 255 ký tự.'
+        ]);
+
+        $hocphan = HocPhan::findOrFail($id);
+
+        $hocphan->update([
+            'NganhID' => $request->NganhID,
+            'TenHocPhan' => $request->TenHocPhan,
+            'MoTa' => $request->MoTa
+        ]);
+
+        return redirect()->route('admin.hoc-phan.index')->with('success', 'Cập nhật thông tin học phần thành công!');
+    }
 
     // Hàm nhận lệnh xóa từ Modal giao diện
     public function destroy($id)
