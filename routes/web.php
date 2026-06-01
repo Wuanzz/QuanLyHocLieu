@@ -59,6 +59,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('khoa', KhoaController::class);
     Route::resource('nganh', NganhController::class);
+    Route::get('hoc-phan/get-nganh', [HocPhanController::class, 'getNganhByKhoa'])->name('hoc-phan.getNganh');
     Route::resource('hoc-phan', HocPhanController::class);
     Route::resource('nguoi-dung', NguoiDungController::class);
 });
