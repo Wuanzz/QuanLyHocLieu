@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\NguoiDung;
+use Illuminate\Support\Facades\Hash;
 
 class NguoiDungController extends Controller
 {
@@ -38,9 +39,44 @@ class NguoiDungController extends Controller
         return view('admin.nguoidung.index', compact('nguoidungs', 'timKiem', 'vaiTro', 'tongSo'));
     }
 
-    // Các hàm trống tạm thời
-    public function create() { return "View Create đang được xây dựng"; }
-    public function store(Request $request) {}
+    public function create()
+    {
+        return view('admin.nguoidung.create');
+    }
+
+    public function store(Request $request)
+    {
+        // Kiểm tra tính hợp lệ của dữ liệu đầu vào
+        $request->validate([
+            'HoTen' => 'required|max:255',
+            'Email' => 'required|email|unique:NguoiDung,Email', // Bắt buộc Email chưa từng tồn tại
+            'MatKhau' => 'required|min:6',
+            'VaiTro' => 'required|in:SinhVien,GiangVien,Admin',
+            'TrangThai' => 'required|in:HoatDong,Khoa',
+        ], [
+            'HoTen.required' => 'Vui lòng nhập họ tên người dùng.',
+            'Email.required' => 'Vui lòng nhập địa chỉ email.',
+            'Email.email' => 'Địa chỉ email không đúng định dạng.',
+            'Email.unique' => 'Email này đã được sử dụng trong hệ thống.',
+            'MatKhau.required' => 'Vui lòng nhập mật khẩu.',
+            'MatKhau.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'VaiTro.required' => 'Vui lòng chọn vai trò phân quyền.',
+            'TrangThai.required' => 'Vui lòng chọn trạng thái hoạt động.',
+        ]);
+
+        // Lưu dữ liệu vào Database
+        \App\Models\NguoiDung::create([
+            'HoTen' => $request->HoTen,
+            'Email' => $request->Email,
+            'MatKhau' => Hash::make($request->MatKhau), // Mã hóa mật khẩu bảo mật
+            'VaiTro' => $request->VaiTro,
+            'TrangThai' => $request->TrangThai,
+            'NgayDangKy' => now(), // Tự động lấy ngày giờ hiện tại của hệ thống
+        ]);
+
+        // Chuyển hướng kèm thông báo
+        return redirect()->route('admin.nguoi-dung.index')->with('success', 'Thêm người dùng mới thành công!');
+    }
 
     public function edit($id)
     {
