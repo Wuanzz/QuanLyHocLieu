@@ -84,5 +84,11 @@ class KhoaController extends Controller
         return redirect()->route('admin.khoa.index')->with('success', 'Cập nhật thông tin khoa thành công!');
     }
 
-    public function destroy($id) { return "View Delete đang được xây dựng"; }
+    public function destroy($id)
+    {
+        $khoa = Khoa::findOrFail($id);
+        $khoa->delete();
+
+        return redirect()->route('admin.khoa.index')->with('success', 'Xóa khoa thành công!');
+    }
 }

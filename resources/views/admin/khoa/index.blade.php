@@ -53,16 +53,42 @@
                                             <i class="fa-solid fa-pen-to-square"></i> Sửa
                                         </a>
                                         
-                                        <form action="{{ route('admin.khoa.destroy', $item->KhoaID) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa Khoa này không?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm">
-                                                <i class="fa-solid fa-trash"></i> Xóa
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $item->KhoaID }}">
+                                            <i class="fa-solid fa-trash"></i> Xóa
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
+
+                            <div class="modal fade" id="deleteModal-{{ $item->KhoaID }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ $item->KhoaID }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 rounded-4 shadow">
+                                        <div class="modal-header bg-danger text-white border-bottom-0 py-3 px-4">
+                                            <h5 class="modal-title fw-bold" id="deleteModalLabel-{{ $item->KhoaID }}">
+                                                <i class="fa-solid fa-triangle-exclamation me-2"></i>Xác nhận xóa Khoa
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-modal="dismiss" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <p class="text-dark fs-6 mb-3">Bạn có chắc chắn muốn xóa khoa này không? Hành động này sẽ không thể hoàn tác!</p>
+                                            <div class="p-3 bg-light rounded-3 border border-light small text-start">
+                                                <div class="mb-1"><strong>Tên Khoa:</strong> <span class="text-primary fw-bold">{{ $item->TenKhoa }}</span></div>
+                                                <div><strong>Mô tả:</strong> <span class="text-muted">{{ $item->MoTa ?? 'Chưa có mô tả.' }}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-top-0 p-3 pt-0 px-4">
+                                            <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                                            <form action="{{ route('admin.khoa.destroy', $item->KhoaID) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
+                                                    Xác nhận Xóa
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
                     @else
                         <tr>
@@ -81,11 +107,9 @@
 @if ($khoas->lastPage() > 1)
     <nav aria-label="Page navigation" class="mt-4 mb-5">
         <ul class="pagination justify-content-center shadow-sm rounded-pill overflow-hidden d-inline-flex">
-            
             <li class="page-item {{ $khoas->currentPage() == 1 ? 'disabled' : '' }}">
                 <a class="page-link fw-bold text-primary border-0 py-2 px-3" href="{{ $khoas->url($khoas->currentPage() - 1) }}">&laquo; Trước</a>
             </li>
-
             @for ($i = 1; $i <= $khoas->lastPage(); $i++)
                 @if ($i == 1 || $i == $khoas->lastPage() || abs($i - $khoas->currentPage()) <= 1)
                     <li class="page-item {{ $i == $khoas->currentPage() ? 'active' : '' }}">
@@ -97,11 +121,9 @@
                     <li class="page-item disabled"><span class="page-link text-muted fw-bold border-0 py-2 px-3">...</span></li>
                 @endif
             @endfor
-
             <li class="page-item {{ $khoas->currentPage() == $khoas->lastPage() ? 'disabled' : '' }}">
                 <a class="page-link fw-bold text-primary border-0 py-2 px-3" href="{{ $khoas->url($khoas->currentPage() + 1) }}">Sau &raquo;</a>
             </li>
-
         </ul>
     </nav>
 @endif
