@@ -52,7 +52,37 @@ class KhoaController extends Controller
         // Quay lại trang danh sách kèm thông báo thành công
         return redirect()->route('admin.khoa.index')->with('success', 'Thêm khoa mới thành công!');
     }
-    public function edit($id) { return "View Edit đang được xây dựng"; }
-    public function update(Request $request, $id) {}
+
+    public function edit($id)
+    {
+        // Tìm Khoa theo KhoaID, nếu không thấy sẽ tự động quăng lỗi 404
+        $khoa = Khoa::findOrFail($id);
+        
+        return view('admin.khoa.edit', compact('khoa'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Kiểm tra tính hợp lệ của dữ liệu đầu vào
+        $request->validate([
+            'TenKhoa' => 'required|max:255',
+            'MoTa' => 'nullable'
+        ], [
+            'TenKhoa.required' => 'Vui lòng nhập tên khoa.',
+            'TenKhoa.max' => 'Tên khoa không được vượt quá 255 ký tự.'
+        ]);
+
+        $khoa = Khoa::findOrFail($id);
+
+        // Cập nhật dữ liệu vào cơ sở dữ liệu
+        $khoa->update([
+            'TenKhoa' => $request->TenKhoa,
+            'MoTa' => $request->MoTa
+        ]);
+
+        // Điều hướng về trang danh sách kèm thông báo thành công
+        return redirect()->route('admin.khoa.index')->with('success', 'Cập nhật thông tin khoa thành công!');
+    }
+
     public function destroy($id) { return "View Delete đang được xây dựng"; }
 }
