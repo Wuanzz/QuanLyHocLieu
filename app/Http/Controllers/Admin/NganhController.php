@@ -58,11 +58,44 @@ class NganhController extends Controller
         // Quay lại trang danh sách kèm thông báo
         return redirect()->route('admin.nganh.index')->with('success', 'Thêm ngành đào tạo mới thành công!');
     }
-    
-    public function edit($id) { return "View Edit đang được xây dựng"; }
-    public function update(Request $request, $id) {}
 
-    // Hàm xử lý Xóa dữ liệu nhận từ Modal
+    public function edit($id)
+    {
+        // Tìm Ngành theo ID, nếu không thấy tự động trả về lỗi 404
+        $nganh = \App\Models\Nganh::findOrFail($id);
+        
+        // Lấy danh sách Khoa để người dùng có thể chọn lại Khoa nếu muốn đổi
+        $danhSachKhoa = \App\Models\Khoa::orderBy('TenKhoa', 'asc')->get();
+        
+        return view('admin.nganh.edit', compact('nganh', 'danhSachKhoa'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Kiểm tra dữ liệu đầu vào
+        $request->validate([
+            'KhoaID' => 'required',
+            'TenNganh' => 'required|max:255',
+            'MoTa' => 'nullable'
+        ], [
+            'KhoaID.required' => 'Vui lòng chọn Khoa trực thuộc.',
+            'TenNganh.required' => 'Vui lòng nhập tên ngành đào tạo.',
+            'TenNganh.max' => 'Tên ngành không được vượt quá 255 ký tự.'
+        ]);
+
+        $nganh = \App\Models\Nganh::findOrFail($id);
+
+        // Tiến hành cập nhật vào CSDL
+        $nganh->update([
+            'KhoaID' => $request->KhoaID,
+            'TenNganh' => $request->TenNganh,
+            'MoTa' => $request->MoTa
+        ]);
+
+        // Chuyển hướng về danh sách kèm thông báo thành công
+        return redirect()->route('admin.nganh.index')->with('success', 'Cập nhật thông tin ngành thành công!');
+    }
+
     public function destroy($id)
     {
         $nganh = Nganh::findOrFail($id);
