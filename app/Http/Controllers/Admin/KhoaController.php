@@ -27,9 +27,31 @@ class KhoaController extends Controller
         return view('admin.khoa.index', compact('khoas', 'timKiem'));
     }
 
-    // Các hàm trống tạm thời để không bị lỗi khi click nút Thêm/Sửa/Xóa
-    public function create() { return "View Create đang được xây dựng"; }
-    public function store(Request $request) {}
+    public function create()
+    {
+        return view('admin.khoa.create');
+    }
+
+    public function store(Request $request)
+    {
+        // Kiểm tra tính hợp lệ của dữ liệu
+        $request->validate([
+            'TenKhoa' => 'required|max:255',
+            'MoTa' => 'nullable'
+        ], [
+            'TenKhoa.required' => 'Vui lòng nhập tên khoa.',
+            'TenKhoa.max' => 'Tên khoa không được vượt quá 255 ký tự.'
+        ]);
+
+        // Thêm mới vào CSDL
+        Khoa::create([
+            'TenKhoa' => $request->TenKhoa,
+            'MoTa' => $request->MoTa
+        ]);
+
+        // Quay lại trang danh sách kèm thông báo thành công
+        return redirect()->route('admin.khoa.index')->with('success', 'Thêm khoa mới thành công!');
+    }
     public function edit($id) { return "View Edit đang được xây dựng"; }
     public function update(Request $request, $id) {}
     public function destroy($id) { return "View Delete đang được xây dựng"; }
