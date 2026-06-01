@@ -27,9 +27,38 @@ class NganhController extends Controller
         return view('admin.nganh.index', compact('nganhs', 'timKiem'));
     }
 
-    // Các hàm trống tạm thời để chờ làm ở bước tiếp theo
-    public function create() { return "View Create đang được xây dựng"; }
-    public function store(Request $request) {}
+    public function create()
+    {
+        // Lấy danh sách Khoa để đưa vào Dropdown (sắp xếp theo tên cho dễ tìm)
+        $danhSachKhoa = \App\Models\Khoa::orderBy('TenKhoa', 'asc')->get();
+        
+        return view('admin.nganh.create', compact('danhSachKhoa'));
+    }
+
+    public function store(Request $request)
+    {
+        // Kiểm tra tính hợp lệ của dữ liệu
+        $request->validate([
+            'KhoaID' => 'required',
+            'TenNganh' => 'required|max:255',
+            'MoTa' => 'nullable'
+        ], [
+            'KhoaID.required' => 'Vui lòng chọn Khoa trực thuộc.',
+            'TenNganh.required' => 'Vui lòng nhập tên ngành đào tạo.',
+            'TenNganh.max' => 'Tên ngành không được vượt quá 255 ký tự.'
+        ]);
+
+        // Thêm mới vào CSDL
+        \App\Models\Nganh::create([
+            'KhoaID' => $request->KhoaID,
+            'TenNganh' => $request->TenNganh,
+            'MoTa' => $request->MoTa
+        ]);
+
+        // Quay lại trang danh sách kèm thông báo
+        return redirect()->route('admin.nganh.index')->with('success', 'Thêm ngành đào tạo mới thành công!');
+    }
+    
     public function edit($id) { return "View Edit đang được xây dựng"; }
     public function update(Request $request, $id) {}
 
