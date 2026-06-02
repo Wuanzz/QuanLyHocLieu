@@ -39,16 +39,16 @@
                                     <td class="fw-bold text-dark">
                                         {{ $item->TenTaiLieu }}
                                         <br />
-                                        <a href="{{ $item->DuongDanFile }}" target="_blank" class="text-info small text-decoration-none d-inline-block mt-1">
+                                        <a href="{{ asset('storage/' . $item->DuongDanFile) }}" target="_blank" class="text-info small text-decoration-none d-inline-block mt-1">
                                             <i class="fa-regular fa-eye me-1"></i>Xem nội dung
                                         </a>
                                     </td>
-                                    <td>{{ $item->HocPhan?->TenHocPhan }}</td>
+                                    <td class="text-dark fw-bold small">{{ $item->HocPhan?->TenHocPhan }}</td>
                                     <td><span class="text-muted small fw-bold">{{ $item->NguoiDung?->HoTen }}</span></td>
                                     <td class="text-muted small">{{ \Carbon\Carbon::parse($item->NgayUpload)->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <form action="{{ route('giangvien.kiemduyet.duyetTaiLieu') }}" method="POST">
+                                            <form action="{{ route('giangvien.kiemduyet.duyetTailieu') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->TaiLieuID }}" />
                                                 <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">Duyệt</button>
@@ -95,7 +95,7 @@
                                     <td class="fw-bold text-danger">
                                         {{ $item->TaiLieu?->TenTaiLieu }}
                                         <br />
-                                        <a href="{{ $item->TaiLieu?->DuongDanFile }}" target="_blank" class="text-info small text-decoration-none d-inline-block mt-1">
+                                        <a href="{{ asset('storage/' . $item->TaiLieu?->DuongDanFile) }}" target="_blank" class="text-info small text-decoration-none d-inline-block mt-1">
                                             <i class="fa-solid fa-magnifying-glass me-1"></i>Kiểm tra file
                                         </a>
                                     </td>
@@ -143,8 +143,7 @@
                                 </div>
                             @endforeach
                         @else
-                            <tr><td colspan="5" class="text-center py-5 text-success fw-bold fst-italic"><i class="fa-solid fa-heart-circle-check me-2 fs-5"></i>Không có tài liệu nào bị báo cáo vi phạm.</td>
-                            </tr>
+                            <tr><td colspan="5" class="text-center py-5 text-success fw-bold fst-italic"><i class="fa-solid fa-heart-circle-check me-2 fs-5"></i>Không có tài liệu nào bị báo cáo vi phạm.</td></tr>
                         @endif
                     </tbody>
                 </table>
@@ -163,7 +162,7 @@
                     <thead class="table-light">
                         <tr>
                             <th width="40%">Nội dung bình luận</th>
-                            <th width="20%">Tại tài liệu</th>
+                            <th width="20%">Tại tài liệu / Bài viết</th>
                             <th width="13%">Người đăng</th>
                             <th width="15%">Thời gian</th>
                             <th class="text-center" width="12%">Quyết định</th>
@@ -175,9 +174,17 @@
                                 <tr>
                                     <td class="fw-bold text-dark fst-italic">"{{ $item->NoiDung }}"</td>
                                     <td>
-                                        <a href="{{ route('admin.dashboard') }}" target="_blank" class="text-decoration-none fw-bold small text-primary">
-                                            {{ $item->TaiLieu?->TenTaiLieu }}
-                                        </a>
+                                        @if(!empty($item->TaiLieu?->TenTaiLieu))
+                                            <span class="d-block text-truncate small text-dark fw-bold" style="max-width: 220px;" title="{{ $item->TaiLieu->TenTaiLieu }}">
+                                                Tài liệu: {{ $item->TaiLieu->TenTaiLieu }}
+                                            </span>
+                                        @elseif(!empty($item->Review?->HocPhan?->TenHocPhan))
+                                            <span class="d-block text-truncate small text-dark fw-bold" style="max-width: 220px;" title="Review môn: {{ $item->Review->HocPhan->TenHocPhan }}">
+                                                Review: {{ $item->Review->HocPhan->TenHocPhan }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted small fst-italic">Không xác định</span>
+                                        @endif
                                     </td>
                                     <td><span class="text-muted small fw-bold">{{ $item->NguoiDung?->HoTen }}</span></td>
                                     <td class="text-muted small">{{ \Carbon\Carbon::parse($item->NgayDang)->format('d/m/Y H:i') }}</td>
@@ -228,12 +235,16 @@
                             @foreach ($reviewChoDuyet as $item)
                                 <tr>
                                     <td class="fw-bold text-dark fst-italic">"{{ $item->NoiDung }}"</td>
-                                    <td><span class="fw-bold small text-secondary">{{ $item->HocPhan?->TenHocPhan }}</span></td>
+                                    <td class="text-dark fw-bold small">{{ $item->HocPhan?->TenHocPhan }}</td>
                                     <td><span class="text-muted small fw-bold">{{ $item->NguoiDung?->HoTen }}</span></td>
                                     <td>
-                                        @for ($i = 0; $i < $item->SoSao; $i++)
-                                            <span class="text-warning small">⭐</span>
-                                        @endfor
+                                        @if($item->SoSao > 0)
+                                            @for ($i = 0; $i < $item->SoSao; $i++)
+                                                <span class="text-warning small">⭐</span>
+                                            @endfor
+                                        @else
+                                            <span class="badge bg-light text-muted border border-light px-2 py-1 small fw-normal shadow-sm">Khởi tạo (0 sao)</span>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">

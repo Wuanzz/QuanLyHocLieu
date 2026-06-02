@@ -10,6 +10,7 @@ use App\Models\Nganh;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\BinhLuan;
+use App\Services\GeminiService;
 
 class TaiLieuController extends Controller
 {
@@ -20,7 +21,7 @@ class TaiLieuController extends Controller
         $locHocPhan = $request->input('locHocPhan');
 
         // Bắt đầu câu truy vấn, kết nối sẵn với bảng Học phần và Người dùng
-        $query = TaiLieu::with(['HocPhan', 'NguoiDung']);
+        $query = TaiLieu::with(['HocPhan', 'NguoiDung'])->where('TrangThaiDuyet', 'HopLe');
 
         // Xử lý logic Tìm kiếm theo tên
         if (!empty($timKiem)) {
@@ -67,7 +68,7 @@ class TaiLieuController extends Controller
             $file = $request->file('fileUpload');
             $filename = time() . '_' . $file->getClientOriginalName();
             
-            // LƯU Ý SỬA ĐỔI: Lưu trực tiếp vào ổ 'public' để đường dẫn trong DB được gọn gàng
+            // Lưu trực tiếp vào ổ 'public' để đường dẫn trong DB được gọn gàng
             $path = $file->storeAs('tailieu', $filename, 'public');
             
             $sizeMB = round($file->getSize() / 1048576, 2);
@@ -111,7 +112,8 @@ class TaiLieuController extends Controller
             'HocPhan', 
             'NguoiDung', 
             'BinhLuans' => function($query) {
-                $query->orderBy('NgayDang', 'desc');
+                // Chỉ nạp những bình luận sạch (HopLe) lên giao diện người dùng
+                $query->where('TrangThaiDuyet', 'HopLe')->orderBy('NgayDang', 'desc');
             },
             'BinhLuans.NguoiDung'
         ])->findOrFail($id);
@@ -135,21 +137,31 @@ class TaiLieuController extends Controller
         return response()->download($filePath, $taiLieu->TenTaiLieu . '.' . pathinfo($filePath, PATHINFO_EXTENSION));
     }
 
-    // Hàm xử lý Thêm Bình luận
-    public function addComment(Request $request)
+    // Tích hợp dịch vụ Gemini AI tự động chấm điểm văn bản
+    public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
             'TaiLieuID' => 'required',
             'NoiDung' => 'required|max:500'
         ]);
 
+        // Gọi AI chạy thẩm định văn bản bình luận
+        $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
+
+        // Chuyển đổi trạng thái lưu trữ dựa vào kết quả phân loại
+        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
+
         BinhLuan::create([
             'TaiLieuID' => $request->TaiLieuID,
             'NguoiDungID' => Auth::id(),
             'NoiDung' => $request->NoiDung,
             'NgayDang' => now(),
-            'TrangThaiDuyet' => 'HopLe' // Cho phép hiển thị ngay
+            'TrangThaiDuyet' => $trangThaiDuyet
         ]);
+
+        if ($trangThaiDuyet === 'ChoDuyet') {
+            return back()->with('info', 'Bình luận của bạn chứa yếu tố cần xem xét và đang chờ kiểm duyệt.');
+        }
 
         return back()->with('success', 'Đã thêm bình luận thành công.');
     }

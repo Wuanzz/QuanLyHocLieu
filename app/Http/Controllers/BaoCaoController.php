@@ -24,6 +24,6 @@ class BaoCaoController extends Controller
         ]);
 
         // Trả về trang chi tiết kèm session thông báo để view hiển thị
-        return back()->with('ThongBaoBaoCao', 'Cảm ơn bạn. Quản trị viên sẽ xem xét báo cáo này sớm nhất.');
+        return back()->with('ThongBaoBaoCao', 'Cảm ơn bạn. Giảng viên sẽ xem xét báo cáo này sớm nhất.');
     }
 }

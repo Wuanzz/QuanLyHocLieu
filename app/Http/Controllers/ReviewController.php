@@ -10,13 +10,15 @@ use App\Models\HocPhan;
 use App\Models\BinhLuan;
 use App\Models\DanhGiaReview;
 use Illuminate\Support\Facades\Auth;
+use App\Services\GeminiService; // BỔ SUNG: Khai báo Service AI ở đây
 
 class ReviewController extends Controller
 {
     public function index()
     {
-        // Eager load quan hệ 'danhGias' để tính điểm trung bình
+        // Chỉ hiển thị các bài review sạch (HopLe) ra không gian chung
         $reviews = Review::with(['HocPhan', 'NguoiDung', 'danhGias'])
+            ->where('TrangThaiDuyet', 'HopLe')
             ->orderBy('NgayDang', 'desc')
             ->get();
 
@@ -29,7 +31,7 @@ class ReviewController extends Controller
         return view('review.create', compact('danhSachKhoa'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, GeminiService $geminiService)
     {
         $request->validate([
             'HocPhanID' => 'required',
@@ -40,14 +42,24 @@ class ReviewController extends Controller
             'NoiDung.min' => 'Nội dung đánh giá quá ngắn (tối thiểu 10 ký tự).'
         ]);
 
-        // Tạo bài review 
+        // Gọi AI chạy phân tích nội dung đánh giá môn học
+        $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
+        
+        // Định hình trạng thái lưu trữ dựa vào AI
+        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
+
         Review::create([
             'HocPhanID' => $request->HocPhanID,
             'NguoiDungID' => Auth::id(),
             'NoiDung' => $request->NoiDung,
+            'SoSao' => 0,
             'NgayDang' => now(),
-            'TrangThaiDuyet' => 'HopLe'
+            'TrangThaiDuyet' => $trangThaiDuyet
         ]);
+
+        if ($trangThaiDuyet === 'ChoDuyet') {
+            return redirect()->route('review.index')->with('info', 'Bài đánh giá của bạn chứa yếu tố nhạy cảm và đang chờ Giảng viên kiểm duyệt.');
+        }
 
         return redirect()->route('review.index')->with('success', 'Đã đăng bài review thành công! Hãy chờ cộng đồng đánh giá điểm số.');
     }
@@ -58,7 +70,7 @@ class ReviewController extends Controller
         
         $danhSachBinhLuan = BinhLuan::with('NguoiDung')
             ->where('ReviewID', $id)
-            ->where('TrangThaiDuyet', 'HopLe')
+            ->where('TrangThaiDuyet', 'HopLe') // Chỉ hiển thị bình luận đã kiểm duyệt hợp lệ
             ->orderBy('NgayDang', 'asc')
             ->get();
 
@@ -74,7 +86,6 @@ class ReviewController extends Controller
         return view('review.show', compact('review', 'danhSachBinhLuan', 'userVote'));
     }
 
-    // HÀM MỚI: Xử lý AJAX chấm điểm sao từ cộng đồng
     public function rate(Request $request)
     {
         if (!Auth::check()) {
@@ -122,12 +133,19 @@ class ReviewController extends Controller
         return response()->json($hocphans);
     }
 
-    public function addComment(Request $request)
+    // HÀM ĐÃ SỬA ĐỔI: Thêm GeminiService kiểm duyệt bình luận trong phân hệ Review học phần
+    public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
             'ReviewID' => 'required',
             'NoiDung' => 'required|max:500'
         ]);
+
+        // Gọi AI quét nội dung thảo luận phản hồi bài review
+        $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
+        
+        // Phân loại trạng thái
+        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
 
         BinhLuan::create([
             'ReviewID' => $request->ReviewID,
@@ -135,8 +153,12 @@ class ReviewController extends Controller
             'NguoiDungID' => Auth::id(),
             'NoiDung' => $request->NoiDung,
             'NgayDang' => now(),
-            'TrangThaiDuyet' => 'HopLe'
+            'TrangThaiDuyet' => $trangThaiDuyet
         ]);
+
+        if ($trangThaiDuyet === 'ChoDuyet') {
+            return back()->with('ThongBaoBinhLuan', 'Bình luận chứa từ ngữ chưa phù hợp và đã được chuyển đến bộ phận kiểm duyệt.');
+        }
 
         return back()->with('ThongBaoBinhLuan', 'Đã thêm bình luận thành công.');
     }

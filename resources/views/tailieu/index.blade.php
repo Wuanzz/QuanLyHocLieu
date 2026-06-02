@@ -12,6 +12,27 @@
         </a>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+            <i class="fa-solid fa-circle-info me-2"></i>{{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card shadow-sm border-0 rounded-4 bg-light mb-4">
         <div class="card-body p-4">
             <form id="formTimKiem" action="{{ route('tailieu.index') }}" method="GET" onsubmit="return false;">
@@ -57,7 +78,6 @@
                             <th class="text-primary fw-bold py-3 border-0">Loại</th>
                             <th class="text-primary fw-bold py-3 border-0">Người Up</th>
                             <th class="text-primary fw-bold py-3 border-0">Dung lượng</th>
-                            <th class="text-primary fw-bold py-3 border-0">Trạng thái</th>
                             <th class="text-primary fw-bold py-3 pe-4 border-0 text-center">Thao tác</th>
                         </tr>
                     </thead>
@@ -86,15 +106,6 @@
 
                                     <td class="text-dark"><i class="fa-regular fa-circle-user text-muted me-1"></i>{{ $item->NguoiDung?->HoTen ?? 'Ẩn danh' }}</td>
                                     <td class="text-muted small fw-semibold">{{ $item->KichThuoc }} MB</td>
-                                    <td>
-                                        @if ($item->TrangThaiDuyet == "ChoDuyet")
-                                            <span class="badge bg-white text-dark border border-warning px-3 py-2 rounded-pill shadow-sm"><i class="fa-solid fa-hourglass-half text-warning me-1"></i> Chờ duyệt</span>
-                                        @elseif ($item->TrangThaiDuyet == "HopLe")
-                                            <span class="badge bg-white text-success border border-success px-3 py-2 rounded-pill shadow-sm"><i class="fa-solid fa-check text-success me-1"></i> Hợp lệ</span>
-                                        @else
-                                            <span class="badge bg-white text-danger border border-danger px-3 py-2 rounded-pill shadow-sm"><i class="fa-solid fa-xmark text-danger me-1"></i> Từ chối</span>
-                                        @endif
-                                    </td>
                                     <td class="text-center pe-4">
                                         <div class="d-flex justify-content-center gap-2">
                                             <a class="btn btn-sm btn-primary text-white fw-bold rounded-pill px-3 shadow-sm" href="{{ url('kho-tai-lieu/chi-tiet/' . $item->TaiLieuID) }}"><i class="fa-regular fa-eye text-white me-1"></i>Xem</a>
@@ -105,7 +116,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted fst-italic">
+                                <td colspan="6" class="text-center py-5 text-muted fst-italic">
                                     <i class="fa-solid fa-folder-open fs-1 d-block mb-3 text-secondary opacity-50"></i>
                                     Chưa có tài liệu nào phù hợp với tìm kiếm của bạn.
                                 </td>
