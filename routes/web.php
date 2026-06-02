@@ -68,5 +68,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 // PHÂN HỆ GIẢNG VIÊN (Khu vực kiểm duyệt)
 // ==========================================
 Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', 'giangvien'])->group(function () {
+    // Giao diện chính hiển thị danh sách chờ kiểm duyệt
     Route::get('/kiem-duyet', [KiemDuyetController::class, 'index'])->name('kiemduyet.index');
+    
+    // Hành động phê duyệt Tài liệu
+    Route::post('/kiem-duyet/duyet-tai-lieu', [KiemDuyetController::class, 'duyetTaiLieu'])->name('kiemduyet.duyetTaiLieu');
+    Route::post('/kiem-duyet/tu-choi-tai-lieu', [KiemDuyetController::class, 'tuChoiTaiLieu'])->name('kiemduyet.tuChoiTaiLieu');
+    
+    // Hành động xử lý Báo cáo vi phạm tài liệu
+    Route::post('/kiem-duyet/an-tai-lieu-vi-pham', [KiemDuyetController::class, 'xoaTaiLieuViPham'])->name('kiemduyet.xoaTaiLieuViPham');
+    Route::post('/kiem-duyet/bo-qua-bao-cao', [KiemDuyetController::class, 'boQuaBaoCao'])->name('kiemduyet.boQuaBaoCao');
+    
+    // Hành động kiểm duyệt Bình luận (AI cảnh báo)
+    Route::post('/kiem-duyet/duyet-binh-luan', [KiemDuyetController::class, 'duyetBinhLuan'])->name('kiemduyet.duyetBinhLuan');
+    Route::post('/kiem-duyet/tu-choi-binh-luan', [KiemDuyetController::class, 'tuChoiBinhLuan'])->name('kiemduyet.tuChoiBinhLuan');
+    
+    // Hành động kiểm duyệt Bài Đánh giá (AI cảnh báo)
+    Route::post('/kiem-duyet/duyet-review', [KiemDuyetController::class, 'duyetReview'])->name('kiemduyet.duyetReview');
+    Route::post('/kiem-duyet/tu-choi-review', [KiemDuyetController::class, 'tuChoiReview'])->name('kiemduyet.tuChoiReview');
 });
