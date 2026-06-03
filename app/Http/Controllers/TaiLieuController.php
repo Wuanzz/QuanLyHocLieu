@@ -23,9 +23,10 @@ class TaiLieuController extends Controller
         // Bắt đầu câu truy vấn, kết nối sẵn với bảng Học phần và Người dùng
         $query = TaiLieu::with(['HocPhan', 'NguoiDung'])->where('TrangThaiDuyet', 'HopLe');
 
-        // Xử lý logic Tìm kiếm theo tên
+        // Xử lý logic Tìm kiếm theo tên (NÂNG CẤP: Tìm không dấu, gần đúng, không phân biệt hoa thường)
         if (!empty($timKiem)) {
-            $query->where('TenTaiLieu', 'like', '%' . $timKiem . '%');
+            // Thay vì dùng ->where('TenTaiLieu', 'like', ...), ta dùng whereRaw ép collation
+            $query->whereRaw("TenTaiLieu COLLATE utf8mb4_general_ci LIKE ?", ['%' . $timKiem . '%']);
         }
 
         // Xử lý logic Lọc theo Học phần
@@ -33,7 +34,7 @@ class TaiLieuController extends Controller
             $query->where('HocPhanID', $locHocPhan);
         }
 
-        // Thực thi truy vấn, sắp xếp mới nhất và phân trang (ví dụ 8 item/trang)
+        // Thực thi truy vấn, sắp xếp mới nhất và phân trang
         $taiLieus = $query->orderBy('NgayUpload', 'desc')->paginate(8);
 
         // Giữ lại các tham số lọc trên URL khi bấm sang trang khác
