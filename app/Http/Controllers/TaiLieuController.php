@@ -33,8 +33,8 @@ class TaiLieuController extends Controller
             $query->where('HocPhanID', $locHocPhan);
         }
 
-        // Thực thi truy vấn, sắp xếp mới nhất và phân trang (ví dụ 10 item/trang)
-        $taiLieus = $query->orderBy('NgayUpload', 'desc')->paginate(10);
+        // Thực thi truy vấn, sắp xếp mới nhất và phân trang (ví dụ 8 item/trang)
+        $taiLieus = $query->orderBy('NgayUpload', 'desc')->paginate(8);
 
         // Giữ lại các tham số lọc trên URL khi bấm sang trang khác
         $taiLieus->appends(['timKiem' => $timKiem, 'locHocPhan' => $locHocPhan]);

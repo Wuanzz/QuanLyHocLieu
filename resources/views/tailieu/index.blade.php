@@ -128,8 +128,8 @@
         </div>
 
         @if ($taiLieus->lastPage() > 1)
-            <nav aria-label="Page navigation" class="mt-4 mb-5">
-                <ul class="pagination justify-content-center shadow-sm rounded-pill overflow-hidden d-inline-flex">
+            <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4 mb-5">
+                <ul class="pagination shadow-sm rounded-pill overflow-hidden mb-0">
                     <li class="page-item {{ $taiLieus->currentPage() == 1 ? 'disabled' : '' }}">
                         <a class="page-link fw-bold text-primary border-0 py-2 px-3" href="{{ $taiLieus->url($taiLieus->currentPage() - 1) }}">&laquo; Trước</a>
                     </li>
@@ -161,34 +161,27 @@
     $(document).ready(function() {
         let debounceTimer;
 
-        // Hàm gọi AJAX để lấy dữ liệu
         function liveSearch() {
             let timKiem = $('#timKiem').val();
             let locHocPhan = $('#locHocPhan').val();
             let url = '{{ route("tailieu.index") }}';
 
-            // Thay đổi icon kính lúp thành icon loading để báo hiệu cho người dùng
             $('.fa-magnifying-glass').removeClass('fa-magnifying-glass').addClass('fa-spinner fa-spin');
 
             $.get(url, { timKiem: timKiem, locHocPhan: locHocPhan }, function(data) {
-                // Trích xuất khu vực bảng và phân trang từ response HTML rồi thay thế vào hiện tại
                 $('#khu-vuc-du-lieu').html($(data).find('#khu-vuc-du-lieu').html());
                 
-                // Trả lại icon kính lúp
                 $('.fa-spinner').removeClass('fa-spinner fa-spin').addClass('fa-magnifying-glass');
                 
-                // Cập nhật lại URL trình duyệt để nếu F5 thì vẫn giữ nguyên kết quả
                 window.history.pushState({}, '', url + '?timKiem=' + timKiem + '&locHocPhan=' + locHocPhan);
             });
         }
 
-        // Bắt sự kiện GÕ PHÍM trên ô tìm kiếm
         $('#timKiem').on('keyup', function() {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(liveSearch, 400); // Đợi 400ms sau khi ngừng gõ mới thực thi
+            debounceTimer = setTimeout(liveSearch, 400);
         });
 
-        // Bắt sự kiện THAY ĐỔI trên dropdown môn học
         $('#locHocPhan').on('change', function() {
             liveSearch();
         });

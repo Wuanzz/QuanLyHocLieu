@@ -48,7 +48,7 @@
                                     <td class="text-muted small">{{ \Carbon\Carbon::parse($item->NgayUpload)->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <form action="{{ route('giangvien.kiemduyet.duyetTailieu') }}" method="POST">
+                                            <form action="{{ route('giangvien.kiemduyet.duyetTaiLieu') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->TaiLieuID }}" />
                                                 <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">Duyệt</button>
