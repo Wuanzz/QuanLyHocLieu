@@ -22,6 +22,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    
+    @if (session('info'))
+        <div class="alert bg-info bg-opacity-10 text-info alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid fa-circle-info fs-4 me-3"></i>
+            <div>
+                <strong class="fw-bold">Thông báo:</strong> {{ session('info') }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     @if ($reviews->count() > 0)
          <div class="row g-4">
@@ -64,6 +74,33 @@
                 </div>
             @endforeach
         </div>
+
+        @if ($reviews->lastPage() > 1)
+            <nav aria-label="Page navigation" class="d-flex justify-content-center mt-5 mb-2">
+                <ul class="pagination shadow-sm rounded-pill overflow-hidden mb-0">
+                    <li class="page-item {{ $reviews->currentPage() == 1 ? 'disabled' : '' }}">
+                        <a class="page-link fw-bold text-primary border-0 py-2 px-3" href="{{ $reviews->url($reviews->currentPage() - 1) }}">&laquo; Trước</a>
+                    </li>
+                    
+                    @for ($i = 1; $i <= $reviews->lastPage(); $i++)
+                        @if ($i == 1 || $i == $reviews->lastPage() || abs($i - $reviews->currentPage()) <= 1)
+                            <li class="page-item {{ $i == $reviews->currentPage() ? 'active' : '' }}">
+                                <a class="page-link fw-bold border-0 py-2 px-3 {{ $i == $reviews->currentPage() ? 'bg-primary text-white' : 'text-primary' }}" href="{{ $reviews->url($i) }}">{{ $i }}</a>
+                            </li>
+                        @elseif ($i == 2 && $reviews->currentPage() > 3)
+                            <li class="page-item disabled"><span class="page-link text-muted fw-bold border-0 py-2 px-3">...</span></li>
+                        @elseif ($i == $reviews->lastPage() - 1 && $reviews->currentPage() < $reviews->lastPage() - 2)
+                            <li class="page-item disabled"><span class="page-link text-muted fw-bold border-0 py-2 px-3">...</span></li>
+                        @endif
+                    @endfor
+                    
+                    <li class="page-item {{ $reviews->currentPage() == $reviews->lastPage() ? 'disabled' : '' }}">
+                        <a class="page-link fw-bold text-primary border-0 py-2 px-3" href="{{ $reviews->url($reviews->currentPage() + 1) }}">Sau &raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        @endif
+
     @else
         <div class="card border-0 shadow-sm rounded-4 bg-light py-5 text-center">
             <div class="card-body">

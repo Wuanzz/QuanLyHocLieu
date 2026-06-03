@@ -10,17 +10,17 @@ use App\Models\HocPhan;
 use App\Models\BinhLuan;
 use App\Models\DanhGiaReview;
 use Illuminate\Support\Facades\Auth;
-use App\Services\GeminiService; // BỔ SUNG: Khai báo Service AI ở đây
+use App\Services\GeminiService;
 
 class ReviewController extends Controller
 {
     public function index()
     {
-        // Chỉ hiển thị các bài review sạch (HopLe) ra không gian chung
+        // Phân trang 9 bài mỗi trang để khớp với thiết kế 3 cột
         $reviews = Review::with(['HocPhan', 'NguoiDung', 'danhGias'])
             ->where('TrangThaiDuyet', 'HopLe')
             ->orderBy('NgayDang', 'desc')
-            ->get();
+            ->paginate(9);
 
         return view('review.index', compact('reviews'));
     }
@@ -133,7 +133,6 @@ class ReviewController extends Controller
         return response()->json($hocphans);
     }
 
-    // HÀM ĐÃ SỬA ĐỔI: Thêm GeminiService kiểm duyệt bình luận trong phân hệ Review học phần
     public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
