@@ -126,9 +126,13 @@
                              <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
                                 <small class="text-dark fw-semibold"><i class="fa-solid fa-user-circle text-muted me-1"></i>{{ $item->NguoiDung?->HoTen ?? 'Ẩn danh' }}</small>
                                 <div class="bg-warning bg-opacity-10 px-2 rounded-pill">
-                                    @for ($i = 0; $i < $item->SoSao; $i++)
-                                        <span class="text-warning" style="font-size: 0.75rem;">⭐</span>
-                                    @endfor
+                                    @if($item->SoSao > 0)
+                                        @for ($i = 0; $i < $item->SoSao; $i++)
+                                            <span class="text-warning" style="font-size: 0.75rem;">⭐</span>
+                                        @endfor
+                                    @else
+                                        <span class="text-muted" style="font-size: 0.7rem;">Chưa có vote</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

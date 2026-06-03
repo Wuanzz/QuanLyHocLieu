@@ -12,18 +12,20 @@ class HomeController extends Controller
     public function index()
     {
         // Đếm số lượng thực tế từ Database
-        $tongTaiLieu = TaiLieu::count();
-        $tongReview = Review::count();
+        $tongTaiLieu = TaiLieu::where('TrangThaiDuyet', 'HopLe')->count();
+        $tongReview = Review::where('TrangThaiDuyet', 'HopLe')->count();
         $tongNguoiDung = NguoiDung::count();
 
         // Lấy 4 tài liệu mới nhất (kèm thông tin Người đăng và Học phần)
         $taiLieuMoi = TaiLieu::with(['NguoiDung', 'HocPhan'])
+            ->where('TrangThaiDuyet', 'HopLe')
             ->orderBy('NgayUpload', 'desc')
             ->take(4)
             ->get();
 
         // Lấy 4 đánh giá mới nhất (kèm thông tin Người đăng và Học phần)
         $reviewMoi = Review::with(['NguoiDung', 'HocPhan'])
+            ->where('TrangThaiDuyet', 'HopLe')
             ->orderBy('NgayDang', 'desc')
             ->take(5)
             ->get();
