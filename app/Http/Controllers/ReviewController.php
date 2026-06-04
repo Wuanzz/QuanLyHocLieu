@@ -31,6 +31,7 @@ class ReviewController extends Controller
         return view('review.create', compact('danhSachKhoa'));
     }
 
+    // NÂNG CẤP LOGIC: Áp dụng rẽ nhánh 3 trạng thái cho khâu đăng tải bài Review
     public function store(Request $request, GeminiService $geminiService)
     {
         $request->validate([
@@ -45,8 +46,14 @@ class ReviewController extends Controller
         // Gọi AI chạy phân tích nội dung đánh giá môn học
         $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
         
-        // Định hình trạng thái lưu trữ dựa vào AI
-        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
+        // Tách bạch rõ ràng 3 trạng thái kiểm duyệt đầu ra từ AI
+        if ($ketQuaAI === 'HopLe') {
+            $trangThaiDuyet = 'HopLe';
+        } elseif ($ketQuaAI === 'TuChoi') {
+            $trangThaiDuyet = 'BiChan';
+        } else {
+            $trangThaiDuyet = 'ChoDuyet';
+        }
 
         Review::create([
             'HocPhanID' => $request->HocPhanID,
@@ -57,7 +64,9 @@ class ReviewController extends Controller
             'TrangThaiDuyet' => $trangThaiDuyet
         ]);
 
-        if ($trangThaiDuyet === 'ChoDuyet') {
+        if ($trangThaiDuyet === 'BiChan') {
+            return redirect()->route('review.index')->with('error', 'Bài đánh giá của bạn vi phạm tiêu chuẩn nội dung và đã bị hệ thống tự động chặn đăng tải.');
+        } elseif ($trangThaiDuyet === 'ChoDuyet') {
             return redirect()->route('review.index')->with('info', 'Bài đánh giá của bạn chứa yếu tố nhạy cảm và đang chờ Giảng viên kiểm duyệt.');
         }
 
@@ -133,6 +142,7 @@ class ReviewController extends Controller
         return response()->json($hocphans);
     }
 
+    // NÂNG CẤP LOGIC: Áp dụng rẽ nhánh 3 trạng thái cho thảo luận phản hồi bài Review
     public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
@@ -143,8 +153,14 @@ class ReviewController extends Controller
         // Gọi AI quét nội dung thảo luận phản hồi bài review
         $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
         
-        // Phân loại trạng thái
-        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
+        // Tách bạch rõ ràng 3 trạng thái kiểm duyệt đầu ra từ AI
+        if ($ketQuaAI === 'HopLe') {
+            $trangThaiDuyet = 'HopLe';
+        } elseif ($ketQuaAI === 'TuChoi') {
+            $trangThaiDuyet = 'BiChan';
+        } else {
+            $trangThaiDuyet = 'ChoDuyet';
+        }
 
         BinhLuan::create([
             'ReviewID' => $request->ReviewID,
@@ -155,7 +171,9 @@ class ReviewController extends Controller
             'TrangThaiDuyet' => $trangThaiDuyet
         ]);
 
-        if ($trangThaiDuyet === 'ChoDuyet') {
+        if ($trangThaiDuyet === 'BiChan') {
+            return back()->with('ThongBaoBinhLuan', 'Bình luận chứa nội dung vi phạm tiêu chuẩn và đã bị hệ thống tự động chặn.');
+        } elseif ($trangThaiDuyet === 'ChoDuyet') {
             return back()->with('ThongBaoBinhLuan', 'Bình luận chứa từ ngữ chưa phù hợp và đã được chuyển đến bộ phận kiểm duyệt.');
         }
 

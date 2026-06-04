@@ -50,10 +50,27 @@
     </div>
 
     @if (session('ThongBaoBinhLuan'))
-        <div class="alert bg-success bg-opacity-10 text-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
-            <i class="fa-solid fa-robot fs-4 me-3"></i>
+        @php
+            $msg = session('ThongBaoBinhLuan');
+            $alertClass = 'bg-success bg-opacity-10 text-success';
+            $iconClass = 'fa-circle-check';
+            $titleMsg = 'Thành công';
+
+            if (str_contains(strtolower($msg), 'vi phạm') || str_contains(strtolower($msg), 'chặn')) {
+                $alertClass = 'bg-danger bg-opacity-10 text-danger';
+                $iconClass = 'fa-circle-xmark';
+                $titleMsg = 'Bị chặn';
+            } elseif (str_contains(strtolower($msg), 'kiểm duyệt')) {
+                $alertClass = 'bg-warning bg-opacity-10 text-warning-emphasis';
+                $iconClass = 'fa-circle-exclamation';
+                $titleMsg = 'Chờ duyệt';
+            }
+        @endphp
+
+        <div class="alert {{ $alertClass }} alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid {{ $iconClass }} fs-4 me-3"></i>
             <div>
-                <strong class="fw-bold">Hệ thống:</strong> {{ session('ThongBaoBinhLuan') }}
+                <strong class="fw-bold">{{ $titleMsg }}:</strong> {{ $msg }}
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -157,10 +174,8 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        // BẰNG CHỨNG CẢI TIẾN: Đọc dữ liệu từ thuộc tính HTML data, JavaScript hoàn toàn sạch sẽ chuẩn JS thuần
         let currentVote = parseInt($('#star-rating-box').data('user-vote')) || 0;
 
-        // Xử lý hiệu ứng hover chuột lên ngôi sao
         $('#star-rating-box i').hover(function() {
             let val = $(this).data('value');
             $('#star-rating-box i').each(function() {
@@ -171,7 +186,6 @@
                 }
             });
         }, function() {
-            // Khi bỏ chuột ra, khôi phục lại trạng thái đã vote ban đầu
             $('#star-rating-box i').each(function() {
                 if ($(this).data('value') <= currentVote) {
                     $(this).removeClass('fa-regular').addClass('fa-solid');
@@ -181,7 +195,6 @@
             });
         });
 
-        // Bắt sự kiện CLICK để gửi AJAX vote điểm
         $('#star-rating-box i').click(function() {
             let soSao = $(this).data('value');
             let reviewId = '{{ $review->ReviewID }}';
@@ -195,13 +208,11 @@
                     SoSao: soSao
                 },
                 success: function(response) {
-                    // Cập nhật điểm trung bình và số lượt vote mới lên màn hình lập tức
                     $('#diem-trung-binh').text(response.saoTrungBinh);
                     $('#luot-vote').text(response.luotVote);
                     
                     $('#vote-status-text').text(response.success).removeClass('text-danger').addClass('text-success');
                     
-                    // Ghim chặt số sao vừa chọn làm mốc trạng thái mới
                     currentVote = soSao; 
                 },
                 error: function(xhr) {

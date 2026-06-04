@@ -138,7 +138,7 @@ class TaiLieuController extends Controller
         return response()->download($filePath, $taiLieu->TenTaiLieu . '.' . pathinfo($filePath, PATHINFO_EXTENSION));
     }
 
-    // Tích hợp dịch vụ Gemini AI tự động chấm điểm văn bản
+    // Tích hợp dịch vụ Gemini AI tự động thẩm định 3 trạng thái văn bản bình luận
     public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
@@ -149,8 +149,14 @@ class TaiLieuController extends Controller
         // Gọi AI chạy thẩm định văn bản bình luận
         $ketQuaAI = $geminiService->kiemDuyetVanBan($request->NoiDung);
 
-        // Chuyển đổi trạng thái lưu trữ dựa vào kết quả phân loại
-        $trangThaiDuyet = ($ketQuaAI === 'HopLe') ? 'HopLe' : 'ChoDuyet';
+        // NÂNG CẤP LOGIC: Tách bạch rõ ràng 3 trạng thái kiểm duyệt đầu ra
+        if ($ketQuaAI === 'HopLe') {
+            $trangThaiDuyet = 'HopLe';
+        } elseif ($ketQuaAI === 'TuChoi') {
+            $trangThaiDuyet = 'BiChan';
+        } else {
+            $trangThaiDuyet = 'ChoDuyet';
+        }
 
         BinhLuan::create([
             'TaiLieuID' => $request->TaiLieuID,
@@ -160,7 +166,9 @@ class TaiLieuController extends Controller
             'TrangThaiDuyet' => $trangThaiDuyet
         ]);
 
-        if ($trangThaiDuyet === 'ChoDuyet') {
+        if ($trangThaiDuyet === 'BiChan') {
+            return back()->with('error', 'Bình luận của bạn chứa nội dung vi phạm tiêu chuẩn cộng đồng và đã bị hệ thống chặn tự động.');
+        } elseif ($trangThaiDuyet === 'ChoDuyet') {
             return back()->with('info', 'Bình luận của bạn chứa yếu tố cần xem xét và đang chờ kiểm duyệt.');
         }
 

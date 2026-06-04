@@ -33,6 +33,16 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="alert bg-danger bg-opacity-10 text-danger alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid fa-circle-xmark fs-4 me-3"></i>
+            <div>
+                <strong class="fw-bold">Bị chặn:</strong> {{ session('error') }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     @if ($reviews->count() > 0)
          <div class="row g-4">
             @foreach ($reviews as $item)

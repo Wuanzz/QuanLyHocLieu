@@ -12,15 +12,23 @@
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
             <i class="fa-solid fa-circle-check fs-4 text-success me-3"></i>
             <div>{{ session('success') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid fa-circle-info fs-4 text-info me-3"></i>
+            <div>{{ session('info') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
             <i class="fa-solid fa-circle-xmark fs-4 text-danger me-3"></i>
             <div>{{ session('error') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -28,7 +36,7 @@
     @endif
 
     @if (session('ThongBaoBaoCao'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 d-flex align-items-center mb-4" role="alert">
             <i class="fa-solid fa-circle-check fs-4 text-success me-3"></i>
             <div>
                 <strong class="text-success">Thành công!</strong> {{ session('ThongBaoBaoCao') }}
