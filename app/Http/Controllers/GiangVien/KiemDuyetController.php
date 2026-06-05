@@ -8,6 +8,7 @@ use App\Models\TaiLieu;
 use App\Models\BaoCao;
 use App\Models\BinhLuan;
 use App\Models\Review;
+use App\Events\ThongBaoHeThong;
 
 class KiemDuyetController extends Controller
 {
@@ -48,8 +49,14 @@ class KiemDuyetController extends Controller
     // TÀI LIỆU MỚI
     public function duyetTaiLieu(Request $request)
     {
-        $taiLieu = TaiLieu::findOrFail($request->id);
-        $taiLieu->update(['TrangThaiDuyet' => 'HopLe']); // Hoặc 'DaDuyet' tùy cấu trúc bảng cũ của cậu
+        $taiLieu = TaiLieu::with('HocPhan')->findOrFail($request->id);
+        $taiLieu->update(['TrangThaiDuyet' => 'HopLe']); 
+
+        // Phát sóng sự kiện thông báo thời gian thực đến toàn hệ thống
+        $tenMon = $taiLieu->HocPhan ? $taiLieu->HocPhan->TenHocPhan : 'chưa xác định';
+        $message = "Tài liệu mới '{$taiLieu->TenTaiLieu}' của môn {$tenMon} vừa được thêm vào Kho!";
+        event(new ThongBaoHeThong($message));
+
         return back()->with('success', 'Đã phê duyệt tài liệu thành công!');
     }
 
@@ -98,8 +105,14 @@ class KiemDuyetController extends Controller
     // BÀI ĐÁNH GIÁ REVIEW AI CẢNH BÁO
     public function duyetReview(Request $request)
     {
-        $review = Review::findOrFail($request->id);
+        $review = Review::with('HocPhan')->findOrFail($request->id);
         $review->update(['TrangThaiDuyet' => 'HopLe']);
+
+        // Phát sóng sự kiện thông báo thời gian thực đến toàn hệ thống
+        $tenMon = $review->HocPhan ? $review->HocPhan->TenHocPhan : 'chưa xác định';
+        $message = "Một bài review cho môn '{$tenMon}' vừa được đăng tải!";
+        event(new ThongBaoHeThong($message));
+
         return back()->with('success', 'Đã cho phép hiển thị bài review!');
     }
 

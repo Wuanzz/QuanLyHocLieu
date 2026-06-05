@@ -126,6 +126,7 @@
         </div>
     </footer>
 
+    <!-- Khung hiển thị thông báo Toast -->
     <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1055">
         <div id="liveToast" class="toast align-items-center text-white bg-primary border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex p-1">
@@ -141,29 +142,29 @@
     
     <script src="{{ asset('js/site.js') }}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <!-- Thư viện Pusher JS thay thế cho SignalR -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Khởi tạo ăng-ten kết nối đến Hub
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl("/notificationHub")
-                .build();
+            // Khởi tạo kết nối Pusher từ các biến môi trường
+            var pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+                cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
+                encrypted: true
+            });
 
-            // Lắng nghe sự kiện "ReceiveNotification" từ Server
-            connection.on("ReceiveNotification", function (message) {
-                document.getElementById("toastMessage").innerText = message;
+            // Lắng nghe vào kênh phát sóng chung của hệ thống (phải khớp tên channel trong Event)
+            var channel = pusher.subscribe('thong-bao-chung');
 
+            // Bắt sự kiện có tên 'ThongBaoHeThong' được bắn ra từ Backend
+            channel.bind('App\\Events\\ThongBaoHeThong', function(data) {
+                // Đổ dữ liệu text vào Toast
+                document.getElementById("toastMessage").innerText = "🔔 " + data.message;
+
+                // Kích hoạt Toast Bootstrap
                 const toastLiveExample = document.getElementById('liveToast');
                 const toast = new bootstrap.Toast(toastLiveExample, { delay: 6000 });
                 toast.show();
-            });
-
-            // Bắt đầu kết nối
-            connection.start().then(function () {
-                console.log("📡 Đã kết nối SignalR thành công! Sẵn sàng nhận thông báo.");
-            }).catch(function (err) {
-                console.error("Lỗi kết nối SignalR: ", err.toString());
             });
         });
     </script>

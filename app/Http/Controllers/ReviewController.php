@@ -31,7 +31,7 @@ class ReviewController extends Controller
         return view('review.create', compact('danhSachKhoa'));
     }
 
-    // NÂNG CẤP LOGIC: Áp dụng rẽ nhánh 3 trạng thái cho khâu đăng tải bài Review
+    // Áp dụng rẽ nhánh 3 trạng thái cho khâu đăng tải bài Review
     public function store(Request $request, GeminiService $geminiService)
     {
         $request->validate([
@@ -69,6 +69,12 @@ class ReviewController extends Controller
         } elseif ($trangThaiDuyet === 'ChoDuyet') {
             return redirect()->route('review.index')->with('info', 'Bài đánh giá của bạn chứa yếu tố nhạy cảm và đang chờ Giảng viên kiểm duyệt.');
         }
+
+        // Phát sóng sự kiện thông báo thời gian thực đến toàn hệ thống
+        $hocPhan = HocPhan::find($request->HocPhanID);
+        $tenMon = $hocPhan ? $hocPhan->TenHocPhan : 'chưa xác định';
+        $message = "Một bài review cho môn '{$tenMon}' vừa được đăng tải!";
+        event(new \App\Events\ThongBaoHeThong($message));
 
         return redirect()->route('review.index')->with('success', 'Đã đăng bài review thành công! Hãy chờ cộng đồng đánh giá điểm số.');
     }
@@ -142,7 +148,7 @@ class ReviewController extends Controller
         return response()->json($hocphans);
     }
 
-    // NÂNG CẤP LOGIC: Áp dụng rẽ nhánh 3 trạng thái cho thảo luận phản hồi bài Review
+    // Áp dụng rẽ nhánh 3 trạng thái cho thảo luận phản hồi bài Review
     public function addComment(Request $request, GeminiService $geminiService)
     {
         $request->validate([
