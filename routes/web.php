@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaiLieuController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\HoSoController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\NganhController;
@@ -13,6 +14,13 @@ use App\Http\Controllers\Admin\HocPhanController;
 use App\Http\Controllers\Admin\NguoiDungController;
 use App\Http\Controllers\GiangVien\KiemDuyetController;
 use App\Http\Controllers\BaoCaoController;
+
+// ==========================================
+// AI CHATBOT
+// ==========================================
+Route::post('/api/chatbot/send', [ChatBotController::class, 'sendMessage'])->name('chatbot.send');
+Route::post('/api/chatbot/reset', [ChatBotController::class, 'resetSession'])->name('chatbot.reset');
+
 
 // ==========================================
 // XÁC THỰC (Đăng nhập, Đăng xuất)

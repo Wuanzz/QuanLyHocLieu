@@ -170,5 +170,220 @@
     </script>
 
     @stack('scripts')
+
+    {{-- ============================================================
+         AI CHATBOT WIDGET – EduBot
+         ============================================================ --}}
+
+    {{-- Floating Toggle Button --}}
+    <button id="chatbot-toggle" title="Trò chuyện với EduBot" aria-label="Mở trợ lý EduBot">
+        <span class="cb-icon-open">💬</span>
+        <span class="cb-icon-close">✕</span>
+        <span id="chatbot-badge"></span>
+    </button>
+
+    {{-- Chat Window --}}
+    <div id="chatbot-window" role="dialog" aria-label="EduBot – Trợ lý AI" aria-hidden="true">
+
+        {{-- Header --}}
+        <div id="chatbot-header">
+            <div class="cb-avatar">🤖</div>
+            <div class="cb-header-info">
+                <div class="cb-header-name">EduBot</div>
+                <div class="cb-header-status">
+                    <span class="cb-status-dot"></span>
+                    Trực tuyến · Sẵn sàng hỗ trợ
+                </div>
+            </div>
+            <button class="cb-btn-reset" id="chatbot-reset" title="Bắt đầu cuộc trò chuyện mới">
+                🔄 Mới
+            </button>
+        </div>
+
+        {{-- Messages --}}
+        <div id="chatbot-messages">
+            <div class="cb-bubble bot">
+                👋 Xin chào! Mình là <strong>EduBot</strong> – trợ lý AI của EduShare.<br><br>
+                Mình có thể giúp bạn:<br>
+                📚 Tìm tài liệu học tập<br>
+                💡 Giải đáp thắc mắc môn học<br>
+                🛠️ Hướng dẫn sử dụng EduShare<br><br>
+                Bạn cần hỗ trợ gì không?
+            </div>
+            {{-- Typing indicator --}}
+            <div id="cb-typing">
+                <div class="cb-dot"></div>
+                <div class="cb-dot"></div>
+                <div class="cb-dot"></div>
+            </div>
+        </div>
+
+        {{-- Input Footer --}}
+        <div id="chatbot-footer">
+            <form id="chatbot-form" autocomplete="off">
+                @csrf
+                <textarea
+                    id="chatbot-input"
+                    rows="1"
+                    placeholder="Nhập câu hỏi của bạn..."
+                    aria-label="Nhập tin nhắn"
+                    maxlength="2000"
+                ></textarea>
+                <button type="submit" id="chatbot-send" title="Gửi" aria-label="Gửi tin nhắn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </form>
+            <p class="cb-footer-hint">Powered by Google Gemini · EduShare AI</p>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        const toggle   = document.getElementById('chatbot-toggle');
+        const window_  = document.getElementById('chatbot-window');
+        const messages = document.getElementById('chatbot-messages');
+        const form     = document.getElementById('chatbot-form');
+        const input    = document.getElementById('chatbot-input');
+        const sendBtn  = document.getElementById('chatbot-send');
+        const typing   = document.getElementById('cb-typing');
+        const resetBtn = document.getElementById('chatbot-reset');
+        const badge    = document.getElementById('chatbot-badge');
+
+        let isOpen = false;
+        let unreadCount = 0;
+
+        // ── Toggle open/close ──
+        toggle.addEventListener('click', function () {
+            isOpen = !isOpen;
+            toggle.classList.toggle('is-open', isOpen);
+            window_.classList.toggle('is-visible', isOpen);
+            window_.setAttribute('aria-hidden', String(!isOpen));
+
+            if (isOpen) {
+                unreadCount = 0;
+                badge.style.display = 'none';
+                badge.textContent = '';
+                setTimeout(() => input.focus(), 350);
+            }
+        });
+
+        // ── Auto-resize textarea ──
+        input.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // ── Enter to send (Shift+Enter = newline) ──
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // ── Append message bubble ──
+        function appendBubble(text, role) {
+            // Đặt typing indicator luôn ở cuối
+            const bubble = document.createElement('div');
+            bubble.className = 'cb-bubble ' + role;
+
+            // Chuyển đổi markdown cơ bản sang HTML
+            const html = text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+
+            bubble.innerHTML = html;
+            messages.insertBefore(bubble, typing);
+            scrollBottom();
+
+            // Unread badge nếu cửa sổ đóng
+            if (!isOpen && role === 'bot') {
+                unreadCount++;
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+            }
+        }
+
+        function scrollBottom() {
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function setLoading(loading) {
+            sendBtn.disabled = loading;
+            input.disabled   = loading;
+            typing.classList.toggle('show', loading);
+            if (loading) scrollBottom();
+        }
+
+        // ── Send message ──
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendBubble(text, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            setLoading(true);
+
+            try {
+                const csrfToken = document.querySelector('#chatbot-form input[name="_token"]').value;
+                const response  = await fetch('{{ route("chatbot.send") }}', {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type':     'application/json',
+                        'X-CSRF-TOKEN':     csrfToken,
+                        'Accept':           'application/json',
+                    },
+                    body: JSON.stringify({ message: text }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    appendBubble(data.reply, 'bot');
+                } else {
+                    appendBubble('❌ Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại.', 'bot');
+                }
+            } catch (err) {
+                appendBubble('❌ Không thể kết nối EduBot. Kiểm tra kết nối mạng nhé!', 'bot');
+                console.error('ChatBot error:', err);
+            } finally {
+                setLoading(false);
+                input.focus();
+            }
+        });
+
+        // ── Reset session ──
+        resetBtn.addEventListener('click', async function () {
+            try {
+                const csrfToken = document.querySelector('#chatbot-form input[name="_token"]').value;
+                await fetch('{{ route("chatbot.reset") }}', {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept':       'application/json',
+                    },
+                });
+
+                // Xoá tất cả bubble trừ typing indicator
+                const bubbles = messages.querySelectorAll('.cb-bubble');
+                bubbles.forEach(b => b.remove());
+
+                appendBubble('🔄 Đã bắt đầu cuộc trò chuyện mới! Mình có thể giúp gì cho bạn?', 'bot');
+            } catch (err) {
+                console.error('Reset error:', err);
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TaiLieu;
 
 class HocPhan extends Model
 {
@@ -14,5 +15,10 @@ class HocPhan extends Model
     public function Nganh()
     {
         return $this->belongsTo(Nganh::class, 'NganhID', 'NganhID');
+    }
+
+    public function TaiLieus()
+    {
+        return $this->hasMany(TaiLieu::class, 'HocPhanID', 'HocPhanID');
     }
 }
