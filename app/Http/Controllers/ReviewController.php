@@ -14,15 +14,50 @@ use App\Services\GeminiService;
 
 class ReviewController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Phân trang 9 bài mỗi trang để khớp với thiết kế 3 cột
-        $reviews = Review::with(['HocPhan', 'NguoiDung', 'danhGias'])
-            ->where('TrangThaiDuyet', 'HopLe')
-            ->orderBy('NgayDang', 'desc')
-            ->paginate(9);
+        // Nhận tham số tìm kiếm và bộ lọc từ URL
+        $timKiem = $request->input('timKiem');
+        $locHocPhan = $request->input('locHocPhan');
+        $locSao = $request->input('locSao');
 
-        return view('review.index', compact('reviews'));
+        // Khởi tạo câu truy vấn gốc
+        $query = Review::with(['HocPhan', 'NguoiDung', 'danhGias'])
+            ->where('TrangThaiDuyet', 'HopLe');
+
+        // Logic tìm kiếm chuỗi (Không phân biệt dấu và hoa thường)
+        if (!empty($timKiem)) {
+            $query->where(function($q) use ($timKiem) {
+                // Quét trong nội dung Review
+                $q->whereRaw("NoiDung COLLATE utf8mb4_general_ci LIKE ?", ['%' . $timKiem . '%'])
+                  // Hoặc quét trong tên Môn Học
+                  ->orWhereHas('HocPhan', function($q2) use ($timKiem) {
+                      $q2->whereRaw("TenHocPhan COLLATE utf8mb4_general_ci LIKE ?", ['%' . $timKiem . '%']);
+                  });
+            });
+        }
+
+        // Logic lọc theo môn học (Dropdown)
+        if (!empty($locHocPhan)) {
+            $query->where('HocPhanID', $locHocPhan);
+        }
+
+        // Logic lọc theo số sao trung bình (Sub-query an toàn cho Paginate)
+        if (!empty($locSao)) {
+            $reviewTable = (new Review)->getTable();
+            $danhGiaTable = (new DanhGiaReview)->getTable();
+            
+            $query->whereRaw("(SELECT COALESCE(AVG(SoSao), 0) FROM {$danhGiaTable} WHERE {$danhGiaTable}.ReviewID = {$reviewTable}.ReviewID) >= ?", [$locSao]);
+        }
+
+        // Phân trang và giữ nguyên URL parameters khi sang trang khác
+        $reviews = $query->orderBy('NgayDang', 'desc')->paginate(9);
+        $reviews->appends(['timKiem' => $timKiem, 'locHocPhan' => $locHocPhan, 'locSao' => $locSao]);
+
+        // Lấy danh sách Học Phần để đổ vào Dropdown bộ lọc
+        $danhSachHocPhan = HocPhan::orderBy('TenHocPhan', 'asc')->get();
+
+        return view('review.index', compact('reviews', 'danhSachHocPhan', 'timKiem', 'locHocPhan', 'locSao'));
     }
 
     public function create()
